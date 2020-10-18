@@ -29,6 +29,7 @@ jupyter==1.0.0
 jupyter-client==6.1.7
 jupyter-console==6.2.0
 jupyter-core==4.6.3
+jupyter-http-over-ws==0.0.8
 jupyterlab-pygments==0.1.2
 MarkupSafe==1.1.1
 mistune==0.8.4
