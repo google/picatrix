@@ -45,7 +45,7 @@ First time contributors may come across the fact that the code review process ca
 
 Therefore we would like to ask people to hang on, to get through the code review process and try to learn something while going through it. Rest assured, it will get easier next time and even easier the time after that, and before you know it you can contribute code to the project with little to no comments.
 
-And if things are unclear, don't hesitate to ask.
+And if things are unclear, don't hesitate to ask. You can also join the slack channel [here](http://join-open-source-dfir-slack.herokuapp.com/), the channel for picatrix is #picatrix. 
 
 ## Community Guidelines
 
