@@ -21,7 +21,7 @@ from setuptools import setup
 from picatrix import version
 
 
-def ParseRequirements(filename):
+def parse_requirements(filename):
   """Parse python requirements.
 
   Args:
@@ -52,5 +52,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=ParseRequirements('requirements.txt'),
+    install_requires=parse_requirements('requirements.txt'),
 )
