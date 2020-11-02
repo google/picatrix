@@ -31,14 +31,18 @@ def parse_requirements(filename):
     List[str]: a list of requirements.
   """
   with open(filename) as requirements:
-    # Skipping -i https://pypi.org/simple
-    return requirements.readlines()[1:]
+    return requirements.readlines()
 
+
+long_description = (
+    'picatrix - a framework to assist security analysts using '
+    'Colab or Jupyter to perform forensic investigations.')
 
 setup(
     name='picatrix',
     version=version.get_version(),
     description='Picatrix IPython Helpers',
+    long_description=long_description,
     license='Apache License, Version 2.0',
     url='https://github.com/google/picatrix/',
     maintainer='Picatrix development team',
