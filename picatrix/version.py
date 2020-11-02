@@ -18,5 +18,5 @@ __version__ = '20201102'
 
 
 def get_version():
-    """Returns the version information."""
-    return __version__
+  """Returns the version information."""
+  return __version__

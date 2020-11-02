@@ -280,8 +280,9 @@ inlinevar-name-hint=[A-Za-z_][A-Za-z0-9_]*$
 inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
 # Naming hint for method names
-# method-name-hint=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
-method-name-hint=(test|[A-Z_])[a-zA-Z0-9_]*$
+ method-name-hint=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
+#method-name-hint=(test|[A-Z_])[a-zA-Z0-9_]*$
+method-naming-style=snake_case                                                                                                                           
 
 # Regular expression matching correct method names
 # method-rgx=(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$
