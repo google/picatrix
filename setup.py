@@ -18,20 +18,8 @@ from __future__ import unicode_literals
 from setuptools import find_packages
 from setuptools import setup
 
+from picatrix import dependencies
 from picatrix import version
-
-
-def parse_requirements(filename):
-  """Parse python requirements.
-
-  Args:
-    filename (str): The requirement file to read.
-
-  Returns:
-    List[str]: a list of requirements.
-  """
-  with open(filename) as requirements:
-    return requirements.readlines()
 
 
 long_description = (
@@ -56,5 +44,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=parse_requirements('requirements.txt'),
+    install_requires=dependencies.DEPENDENCIES,
 )
