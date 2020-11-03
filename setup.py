@@ -18,27 +18,19 @@ from __future__ import unicode_literals
 from setuptools import find_packages
 from setuptools import setup
 
+from picatrix import dependencies
 from picatrix import version
 
 
-def parse_requirements(filename):
-  """Parse python requirements.
-
-  Args:
-    filename (str): The requirement file to read.
-
-  Returns:
-    List[str]: a list of requirements.
-  """
-  with open(filename) as requirements:
-    # Skipping -i https://pypi.org/simple
-    return requirements.readlines()[1:]
-
+long_description = (
+    'picatrix - a framework to assist security analysts using '
+    'Colab or Jupyter to perform forensic investigations.')
 
 setup(
     name='picatrix',
     version=version.get_version(),
     description='Picatrix IPython Helpers',
+    long_description=long_description,
     license='Apache License, Version 2.0',
     url='https://github.com/google/picatrix/',
     maintainer='Picatrix development team',
@@ -52,5 +44,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=parse_requirements('requirements.txt'),
+    install_requires=dependencies.DEPENDENCIES,
+    test_require='test_requirements.txt',
 )
