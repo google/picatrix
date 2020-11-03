@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Class that loads up all magic libraries."""
+"""Class that defines custom errors for picatrix."""
 
-from picatrix.magics import common
+
+class Error(Exception):
+  """Base error class."""
+
+
+class ArgParserCompleteError(Error):
+  """Raised when the argument parser has exited cleanly."""
