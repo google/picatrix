@@ -454,7 +454,7 @@ def picatrix_magic(
     function: Optional[MagicProtocol] = None,
     arguments: Optional[List[MagicArgument]] = None,
     name: Optional[str] = '', suffix: Optional[str] = '',
-    conditional: Optional[Callable[None, bool]] = None) -> MagicProtocol:
+    conditional: Optional[Callable[[None], bool]] = None) -> MagicProtocol:
   """Decorator to turn functions into iPYthon magics for sstbook.
 
   Args:
