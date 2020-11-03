@@ -21,8 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install pipenv
-        pipenv install -d
+        pip install -r test_requirements.txt
     - name: Run pylint on picatrix and tests
       run: |
         pipenv run pylint --rcfile=.pylintrc setup.py picatrix
