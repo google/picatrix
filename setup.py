@@ -45,4 +45,5 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=dependencies.DEPENDENCIES,
+    test_require='test_requirements.txt',
 )
