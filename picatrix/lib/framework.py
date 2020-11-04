@@ -66,10 +66,10 @@ class MagicArgumentParser(argparse.ArgumentParser):
 
     Raises:
       KeyError: when the parser is unable to parse the arguments.
-      error.ArgParserCompleteError: when the parser has successfully completed.
+      error.ArgParserNonZeroStatus: when the parser has successfully completed.
     """
     if not status:
-      raise error.ArgParserCompleteError('Exiting.')
+      raise error.ArgParserNonZeroStatus('Exiting.')
 
     if message:
       raise KeyError('Wrong usage: {0:s}'.format(message.strip()))
@@ -157,7 +157,7 @@ class _Magic:
           'Correct usage is: {1:s}').format(
               e, self.argument_parser.format_help()))
       return
-    except error.ArgParserCompleteError:
+    except error.ArgParserNonZeroStatus:
       # When argparser ends execution but without an error this exception
       # is raised, eg: when "-h" or help is used. In those cases we need
       # to return without running the magic function.

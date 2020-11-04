@@ -18,5 +18,5 @@ class Error(Exception):
   """Base error class."""
 
 
-class ArgParserCompleteError(Error):
-  """Raised when the argument parser has exited cleanly."""
+class ArgParserNonZeroStatus(Error):
+  """Raised when the argument parser has exited with non-zero status."""
