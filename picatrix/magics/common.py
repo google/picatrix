@@ -13,6 +13,7 @@
 # limitations under the License.
 """Class that defines common picatrix magics."""
 
+from typing import Any
 from typing import Optional
 from typing import Text
 
@@ -20,6 +21,7 @@ import pandas
 
 from picatrix.lib import framework
 from picatrix.lib import manager
+from picatrix.lib import state
 
 
 @framework.picatrix_magic
@@ -49,3 +51,19 @@ def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
       'description': description,
       'function': '{0:s}_func'.format(magic_obj.magic_name),
       'help': magic_obj.argument_parser.format_help()}])
+
+
+@framework.picatrix_magic
+def last_output(data: Optional[Text] = '') -> Any:
+  """Returns the last output from a magic that was executed.
+
+  Args:
+    data (str): optional string that does nothing.
+
+  Returns:
+    The last output from a magic that was run.
+  """
+  state_obj = state.state()
+  last_output = state_obj.last_output
+
+  return last_output

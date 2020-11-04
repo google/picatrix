@@ -32,6 +32,7 @@ except ImportError:
 
 from picatrix.lib import error
 from picatrix.lib import manager
+from picatrix.lib import state
 from picatrix.lib import utils
 
 
@@ -197,14 +198,14 @@ class _Magic:
           option_dict[key] = var_obj
 
     return_value = self.fn(**option_dict)
+    state_obj = state.state()
 
-    # TODO: Redirect STDOUT and STDERR to capture logs, etc.
-    if bind_to:
-      _ = utils.ipython_bind_global(bind_to, return_value)
-    elif not line_magic and variable:
-      _ = utils.ipython_bind_global(variable, return_value)
-    else:
-      return return_value
+    if not line_magic and variable:
+      bind_to = variable
+
+    return state_obj.set_output(
+        output=return_value,
+        bind_to=bind_to)
 
   def __dir__(self):
     options = getattr(self.argument_parser, '_option_string_actions', {})
