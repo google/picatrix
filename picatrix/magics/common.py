@@ -53,6 +53,7 @@ def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
       'help': magic_obj.argument_parser.format_help()}])
 
 
+# pylint: disable=unused-argument
 @framework.picatrix_magic
 def last_output(data: Optional[Text] = '') -> Any:
   """Returns the last output from a magic that was executed.
@@ -64,6 +65,6 @@ def last_output(data: Optional[Text] = '') -> Any:
     The last output from a magic that was run.
   """
   state_obj = state.state()
-  last_output = state_obj.last_output
+  output = state_obj.last_output
 
-  return last_output
+  return output

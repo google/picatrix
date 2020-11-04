@@ -47,7 +47,7 @@ def ask_question(question: str, input_type: Optional[Any] = str) -> Any:
   raise TypeError('Only support str, int and float as input types')
 
 
-def clear_output():
+def clear_notebook_output():
   """Clears the output cell from the notebook."""
   clear_output(wait=True)
 

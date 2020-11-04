@@ -16,16 +16,9 @@ import logging
 import threading
 
 from typing import Any
-from typing import Callable
 from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Text
-from typing import Tuple
-from typing import Union
-
-import pandas
-from IPython import get_ipython
 
 from picatrix.lib import utils
 
@@ -38,6 +31,8 @@ __LOCK = threading.Lock()
 
 def state(refresh_state: bool = False):
   """Property that returns a state object."""
+  # pylint: disable=global-statement
+  # Making sure we have only one state object.
   global __state
   global __LOCK
 
@@ -98,10 +93,14 @@ class State:
       bind_to (str): optional name of a variable. If this is provided
         the output is omitted and variable is stored in the namespace using
         the name provided here.
+
+    Returns:
+      Returns the output object.
     """
     self._last_output = output
 
     if bind_to:
       _ = utils.ipython_bind_global(name=bind_to, value=output)
-    else:
-      return output
+      return None
+
+    return output
