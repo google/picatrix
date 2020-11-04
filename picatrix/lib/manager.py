@@ -89,7 +89,7 @@ class MagicManager:
   def register_magic(
       cls, function: Callable[[str, str], str],
       conditional: Callable[[], bool] = None):
-    """Register magic function as a magic in sstbook.
+    """Register magic function as a magic in picatrix.
 
     Args:
       function (function): the function to register as a line and a
