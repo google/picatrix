@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """List of dependencies for picatrix."""
+import sys
 
 
 DEPENDENCIES = [
@@ -38,4 +39,15 @@ DEPENDENCIES = [
     'timesketch-import-client>=20200910',
     'vega>=3.4.0',
     'xlrd>=1.2.0',
+]
+
+
+# Conditional dependencies define a dependency and then a condition that
+# should return a bool. This bool will then be used to determine whether
+# to include the dependency or not.
+CONDITIONAL_DEPENDENCIES = [
+    (
+        'typing-extensions==3.7.4.3',
+        (sys.version_info.major == 3 and sys.version_info.minor < 8)
+    ),
 ]

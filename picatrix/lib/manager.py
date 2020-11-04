@@ -14,7 +14,9 @@
 """Class that defines the manager for all magics."""
 
 from typing import Callable
+from typing import Dict
 from typing import List
+from typing import Text
 from typing import Tuple
 from typing import Union
 
@@ -27,7 +29,7 @@ from picatrix.lib import utils
 class MagicManager:
   """Manager class for Picatrix magics."""
 
-  _magics = {}
+  _magics: Dict[Text, Callable[[str, str], str]] = {}
 
   @classmethod
   def clear_magics(cls):
@@ -48,6 +50,25 @@ class MagicManager:
       raise KeyError(f'Magic [{magic_name}] is not registered.')
 
     _ = cls._magics.pop(magic_name)
+    try:
+      utils.ipython_remove_global(f'{magic_name}_func')
+    except KeyError:
+      pass
+
+    # Attempt to remove the magic definition.
+    ip = get_ipython()
+    magics_manager = ip.magics_manager
+
+    if not hasattr(magics_manager, 'magics'):
+      return
+
+    line_magics = magics_manager.magics.get('line', {})
+    if magic_name in line_magics:
+      _ = magics_manager.magics.get('line').pop(magic_name)
+
+    cell_magics = magics_manager.magics.get('cell', {})
+    if magic_name in cell_magics:
+      _ = magics_manager.magics.get('cell').pop(magic_name)
 
   @classmethod
   def get_magic(cls, magic_name: str) -> Callable[[str, str], str]:

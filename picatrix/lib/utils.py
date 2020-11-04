@@ -76,3 +76,21 @@ def ipython_get_global(name: str) -> Any:
   """
   ip = get_ipython()
   return ip.all_ns_refs[0][name]
+
+
+def ipython_remove_global(name: str):
+  """Removes a Python object that is bound to the user namespace.
+
+  Args:
+    name (str): Variable name.
+
+  Raises:
+    KeyError: if the variable is not stored in the namespace.
+  """
+  ip = get_ipython()
+  namespace = ip.all_ns_refs[0]
+
+  if name not in namespace:
+    raise KeyError(f'The variable {name} is not currently in the namespace.')
+
+  _ = namespace.pop(name)

@@ -23,6 +23,7 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Text
 from typing import Union
 try:
   # Got introduced in python 3.8.
@@ -77,18 +78,19 @@ class MagicArgumentParser(argparse.ArgumentParser):
     raise KeyError('Wrong usage, no further error message supplied.')
 
 
-class _PicatrixMagic:
-  """The PicatrixMagic decorator."""
+class _Magic:
+  """The Picatrix Magic decorator."""
+
+  argument_parser: MagicArgumentParser
+  magic_name: Text
 
   def __init__(
-      self, fn: MagicProtocol, arguments: Optional[List[Dict[str, str]]] = None,
-      name: Optional[str] = '', suffix: Optional[str] = ''):
+      self, fn: MagicProtocol, arguments: Optional[List[MagicArgument]] = None,
+      name_func: Optional[Callable[[Text], Text]] = None):
     """Initialize the Picatrix Magic."""
     self.fn = fn
-    if name:
-      self.magic_name = name
-    elif suffix:
-      self.magic_name = f'{fn.__name__}_{suffix}'
+    if name_func:
+      self.magic_name = name_func(fn.__name__)
     else:
       self.magic_name = fn.__name__
 
@@ -219,7 +221,7 @@ class _PicatrixMagic:
     if name.startswith('func'):
       return self.fn.__getattribute__(name)  # pytype: disable=attribute-error
 
-    return super(_PicatrixMagic, self).__getattribute__(name)
+    return super(_Magic, self).__getattribute__(name)
 
 
 def _get_arguments_from_arg_lines(arg_lines: List[str]) -> List[Dict[str, str]]:
@@ -453,20 +455,18 @@ def _parse_line_string(line: str) -> List[str]:
 def picatrix_magic(
     function: Optional[MagicProtocol] = None,
     arguments: Optional[List[MagicArgument]] = None,
-    name: Optional[str] = '', suffix: Optional[str] = '',
+    name_func: Optional[Callable[[Text], Text]] = None,
     conditional: Optional[Callable[[None], bool]] = None) -> MagicProtocol:
-  """Decorator to turn functions into iPYthon magics for picatrix.
+  """Decorator to turn functions into IPYthon magics for picatrix.
 
   Args:
     function (function): if the decorator is called without any arguments
         the magic function is passed to the decorator.
     arguments (list): list of MagicArgument objects to pass to the magic
         argument parser.
-    name (str): the name that will be used to register the magic, optional
-        and if not provided the function name will be used.
-    suffix (str): suffix to add to the end of the function name when
-        the magic is registered. This can be used to generate magics
-        with different names that use the same or similar functions.
+    name_func (function: a name function that will accept a single argument
+        and return back a name that will be used to register the magic.
+        Optional and if not provide the name of tbe function will be used.
     conditional (function): a function that should return a bool, used to
         determine whether to register magic or not. This can be used by
         magics to determine whether a magic should be registered or not, for
@@ -478,15 +478,15 @@ def picatrix_magic(
     the decorator function.
   """
   if function:
-    magic_function = _PicatrixMagic(
-        function, name=name, arguments=arguments, suffix=suffix)
+    magic_function = _Magic(
+        function, name_func=name_func, arguments=arguments)
     manager.MagicManager.register_magic(magic_function, conditional)
     return magic_function
 
   def wrapper(func):
     """Wrapper for the magic."""
-    magic_function = _PicatrixMagic(
-        func, name=name, arguments=arguments, suffix=suffix)
+    magic_function = _Magic(
+        func, name_func=name_func, arguments=arguments)
 
     manager.MagicManager.register_magic(magic_function, conditional)
     return magic_function
