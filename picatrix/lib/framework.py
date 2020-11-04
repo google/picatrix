@@ -42,7 +42,7 @@ class MagicProtocol(Protocol):
     pass
 
 
-class MagicArgument(object):
+class MagicArgument:
   """Simple Argument holder for magic arguments."""
 
   def __init__(self, *argc, **kwargs):
@@ -77,7 +77,7 @@ class MagicArgumentParser(argparse.ArgumentParser):
     raise KeyError('Wrong usage, no further error message supplied.')
 
 
-class _PicatrixMagic(object):
+class _PicatrixMagic:
   """The PicatrixMagic decorator."""
 
   def __init__(
