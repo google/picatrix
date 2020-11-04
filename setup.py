@@ -22,6 +22,16 @@ from picatrix import dependencies
 from picatrix import version
 
 
+def get_requirements():
+  """Returns a list of requirements."""
+  requires = dependencies.DEPENDENCIES
+
+  for dependency, condition in dependencies.CONDITIONAL_DEPENDENCIES:
+    if condition:
+      requires.append(dependency)
+  return requires
+
+
 long_description = (
     'picatrix - a framework to assist security analysts using '
     'Colab or Jupyter to perform forensic investigations.')
@@ -44,6 +54,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=dependencies.DEPENDENCIES,
-    test_require='test_requirements.txt',
+    install_requires=get_requirements(),
+    tests_require='test_requirements.txt',
 )
