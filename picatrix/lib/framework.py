@@ -24,7 +24,6 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Text
-from typing import Union
 try:
   # Got introduced in python 3.8.
   from typing import Protocol
@@ -145,7 +144,7 @@ class _Magic:
     self.__doc__ = self.argument_parser.format_help()
 
   # pylint: disable=inconsistent-return-statements
-  def __call__(self, line: str, cell: Optional[str] = None) -> Union[Any, None]:
+  def __call__(self, line: str, cell: Optional[str] = None) -> Optional[Any]:
     line_magic = cell is None
 
     arguments = _parse_line_string(line)
