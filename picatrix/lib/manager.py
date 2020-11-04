@@ -97,8 +97,8 @@ class MagicManager:
       conditional (function): a function that should return a bool, used to
           determine whether to register magic or not. This can be used by
           magics to determine whether a magic should be registered or not, for
-          instance basing that on whether the notebook is being run in borg
-          or local runtime, or whether a connection to a client can be achieved,
+          instance basing that on whether the notebook is able to reach the
+          required service, or whether a connection to a client can be achieved,
           etc. This is optional and if not provided a magic will be registered.
 
     Raises:
