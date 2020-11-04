@@ -13,6 +13,9 @@
 # limitations under the License.
 """Class that defines common picatrix magics."""
 
+from typing import Optional
+from typing import Text
+
 import pandas
 
 from picatrix.lib import framework
@@ -20,7 +23,7 @@ from picatrix.lib import manager
 
 
 @framework.picatrix_magic
-def picatrixmagics(data: str) -> pandas.DataFrame:
+def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
   """Provides information about registered Picatrix magics.
 
   Args:
