@@ -18,6 +18,7 @@ from typing import Any
 from typing import Optional
 
 from IPython import get_ipython
+from IPython.display import clear_output
 
 
 def ask_question(question: str, input_type: Optional[Any] = str) -> Any:
@@ -44,6 +45,11 @@ def ask_question(question: str, input_type: Optional[Any] = str) -> Any:
     return input_type(answer_line)
 
   raise TypeError('Only support str, int and float as input types')
+
+
+def clear_notebook_output():
+  """Clears the output cell from the notebook."""
+  clear_output(wait=True)
 
 
 def ipython_bind_global(name: str, value: Any) -> Any:

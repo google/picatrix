@@ -135,8 +135,9 @@ class MagicManager:
           f'The magic [{magic_name}] is already registered.')
 
     ip = get_ipython()
-    ip.register_magic_function(
-        function, magic_kind='line_cell', magic_name=magic_name)
+    if ip:
+      ip.register_magic_function(
+          function, magic_kind='line_cell', magic_name=magic_name)
 
     cls._magics[magic_name] = function
     function_name = f'{magic_name}_func'
