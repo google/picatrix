@@ -23,7 +23,7 @@ jobs:
       run: |
         pip install pipenv
         pip install -r test_requirements.txt
-        pipenv run PYTHONPATH=. python tools/create_requirements.py 
+        pipenv run python tools/create_requirements.py 
         pip install -r requirements.txt
         pip install -e .
     - name: Run pylint on picatrix and tests
