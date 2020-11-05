@@ -18,6 +18,7 @@ import sys
 DEPENDENCIES = [
     'altair>=4.1.0',
     'click>=7.1.2',
+    'dfdatetime>=20200824',
     'google-auth>=1.22.1',
     'google-auth-oauthlib>=0.4.1',
     'ipython>=7.16.1',
