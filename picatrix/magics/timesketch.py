@@ -37,7 +37,8 @@ from picatrix.lib import state
 from picatrix.lib import utils
 
 
-def _fix_return_fields(return_fields: Union[Text, List[Text]]) -> Text:
+def _fix_return_fields(
+    return_fields: Union[Text, List[Text], None]) -> Optional[Text]:
   """Returns a fixed string of return fields.
 
   The Timesketch API expects the return fields to be a comma separated
@@ -52,6 +53,9 @@ def _fix_return_fields(return_fields: Union[Text, List[Text]]) -> Text:
   """
   if isinstance(return_fields, str):
     return_fields = return_fields.split(',')
+
+  if return_fields is None:
+    return
 
   return_field_list = []
   for field in return_fields:
@@ -559,7 +563,7 @@ def timesketch_query(
     data: Text,
     fields: Optional[Text] = None,
     timelines: Optional[Text] = None,
-    view: Optional[view.View] = None,
+    view: Optional[api_view.View] = None,
     start_date: Optional[Text] = None,
     end_date: Optional[Text] = None,
     max_entries: Optional[int] = 40000) -> pd.DataFrame:
@@ -1128,7 +1132,7 @@ def timesketch_get_sketches(
   state_obj = state.state()
   client = state_obj.get_from_cache('timesketch_client')
 
-  return {x:name: x for x in client.list_sketches()}
+  return {x.name: x for x in client.list_sketches()}
 
 
 # pylint: disable=unused-argument

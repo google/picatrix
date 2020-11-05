@@ -22,6 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pipenv
+        pip install wheel
         pip install -r test_requirements.txt
         pip install -e .
     - name: Run pylint on picatrix and tests
