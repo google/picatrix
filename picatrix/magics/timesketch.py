@@ -55,7 +55,7 @@ def _fix_return_fields(
     return_fields = return_fields.split(',')
 
   if return_fields is None:
-    return
+    return None
 
   return_field_list = []
   for field in return_fields:
@@ -986,7 +986,7 @@ def timesketch_get_aggregations(
 
 # pylint:disable=unused-argument
 @framework.picatrix_magic
-def timesketch_list_available_aggregators(
+def timesketch_available_aggregators(
     data: Optional[Text] = '') -> pd.DataFrame:
   """Returns a data frame with information about available aggregators.
 
@@ -1196,7 +1196,7 @@ def timesketch_get_starred_events(
 
 # pylint: disable=unused-argument
 @framework.picatrix_magic
-def timesketch_get_events_with_comments(
+def timesketch_events_with_comments(
     data: Optional[Text] = '',
     return_fields: Optional[Text] = '',
     max_entries: Optional[int] = None) -> pd.DataFrame:
