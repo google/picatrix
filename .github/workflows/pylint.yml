@@ -25,8 +25,6 @@ jobs:
         pip install -r test_requirements.txt
         pip install -r requirements.txt
         pip install -e .
-        pipenv run python tools/create_requirements.py 
-        pip install -r requirements.txt
     - name: Run pylint on picatrix and tests
       run: |
         pipenv run pylint --rcfile=.pylintrc setup.py picatrix
