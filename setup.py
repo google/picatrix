@@ -29,6 +29,7 @@ def get_requirements():
   for dependency, condition in dependencies.CONDITIONAL_DEPENDENCIES:
     if condition:
       requires.append(dependency)
+  print(requires)
   return requires
 
 
