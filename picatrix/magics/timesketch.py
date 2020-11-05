@@ -6,7 +6,6 @@ It enables colab/jupyter to send and receive data from a Timesketch sketch.
 import datetime
 import logging
 import os
-import tempfile
 
 from typing import Any
 from typing import Dict
@@ -29,8 +28,6 @@ from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
 from timesketch_import_client import helper
 from timesketch_import_client import importer
-
-from IPython.display import clear_output
 
 from picatrix.lib import framework
 from picatrix.lib import state
