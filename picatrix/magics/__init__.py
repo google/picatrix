@@ -14,3 +14,4 @@
 """Class that loads up all magic libraries."""
 
 from picatrix.magics import common
+from picatrix.magics import timesketch
