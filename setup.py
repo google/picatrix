@@ -39,6 +39,7 @@ long_description = (
 setup(
     name='picatrix',
     version=version.get_version(),
+    author = 'Kristinn',
     description='Picatrix IPython Helpers',
     long_description=long_description,
     license='Apache License, Version 2.0',
