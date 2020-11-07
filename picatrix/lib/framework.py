@@ -205,6 +205,7 @@ class _Magic:
 
     return state_obj.set_output(
         output=return_value,
+        magic_name=self.magic_name,
         bind_to=bind_to)
 
   def __dir__(self):
