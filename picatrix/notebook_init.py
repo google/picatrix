@@ -15,9 +15,9 @@
 
 When starting a new notebook using picatrix it is enough to do
 
-  import picatrix
+  from picatrix import notebook_init
 
-  picatrix.init()
+  notebook_init.init()
 
 And that would register magics and initialize the notebook to be able
 to take advantage of picatrix magics and helper functions.
