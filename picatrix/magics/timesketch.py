@@ -178,6 +178,7 @@ def get_context_date(
       'order': 'asc',
       'chips': [{
           'field': '',
+          'type': 'datetime_range',
           'value': date_string}],
   }
 
@@ -505,8 +506,6 @@ def query_timesketch(
     query_filter = {
         'time_start': None,
         'time_end': None,
-        'size': 10000,
-        'terminate_after': 10000,
         'order': 'asc'
     }
 
@@ -515,10 +514,20 @@ def query_timesketch(
   else:
     query_filter['indices'] = '_all'
 
-  if start_date:
-    query_filter['time_start'] = start_date
-  if end_date:
-    query_filter['time_end'] = end_date
+  date_string = ''
+  if start_date and end_date:
+    date_string = f'{start_date},{end_date}'
+  elif start_date:
+    date_string = f'{start_date},'
+  else:
+    date_string = f',{end_date}'
+
+  if date_string:
+    query_filter.setdefaults('chips', [])
+    query_filter['chips'].append({
+        'field': '',
+        'type': 'datetime_range',
+        'value': date_string})
 
   # If view is being sent in, view needs to be the only parameter to the search.
   if view is not None:
@@ -563,6 +572,7 @@ def timesketch_query(
     view: Optional[api_view.View] = None,
     start_date: Optional[Text] = None,
     end_date: Optional[Text] = None,
+    query_filter: Optional[Dict[Text, Any]] = None,
     max_entries: Optional[int] = 40000) -> pd.DataFrame:
   """Run a Timesketch query using a magic.
 
@@ -576,6 +586,7 @@ def timesketch_query(
         YYYY-MM-DDTHH:MM:SS+00:00.
     end_date (str): end date of the result set in the form of
         YYYY-MM-DDTHH:MM:SS+00:00.
+    query_filter (dict): The query filter dict to use.
     max_entries (int): maximum entries of returned object, defaults to 40k.
 
   Raises:
@@ -602,8 +613,9 @@ def timesketch_query(
         type(view)))
 
   return query_timesketch(
-      query=data, view=view, return_fields=fields, indices=indices,
-      start_date=start_date, end_date=end_date, max_entries=max_entries)
+      query=data, view=view, return_fields=fields, query_filter=query_filter,
+      indices=indices, start_date=start_date, end_date=end_date,
+      max_entries=max_entries)
 
 
 @framework.picatrix_magic
