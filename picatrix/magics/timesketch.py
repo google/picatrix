@@ -34,6 +34,23 @@ from picatrix.lib import state
 from picatrix.lib import utils
 
 
+def _add_date_chip(
+    query_filter: Dict[str, Any], start_time: Text, end_time: Text):
+  """Adds a date range chip into a query filter.
+
+  Args:
+    query_filter (dict): the query filter.
+    start_time (str): a date string with the start of the filter.
+    end_time (str): a date string with the end of the filter.
+  """
+  date_string = f'{start_time},{end_time}'
+  query_filter.setdefault('chips', [])
+  query_filter['chips'].append({
+      'field': '',
+      'type': 'datetime_range',
+      'value': date_string})
+
+
 def _fix_return_fields(
     return_fields: Union[Text, List[Text], None]) -> Optional[Text]:
   """Returns a fixed string of return fields.
@@ -169,19 +186,14 @@ def get_context_date(
 
   start_string = start_date.strftime('%Y-%m-%dT%H:%M:%S%z')
   end_string = end_date.strftime('%Y-%m-%dT%H:%M:%S%z')
-  date_string = f'{start_string},{end_string}'
 
   query_filter = {
       'time_start': None,
       'time_end': None,
       'indices': ['_all'],
       'order': 'asc',
-      'chips': [{
-          'field': '',
-          'type': 'datetime_range',
-          'value': date_string}],
   }
-
+  _add_date_chip(query_filter, start_string, end_string)
   return_fields = _fix_return_fields(return_fields)
   return query_timesketch(
       '*',
@@ -464,8 +476,8 @@ def query_timesketch(
     query_filter: Optional[Dict[Text, Any]] = None,
     view: Optional[api_view.View] = None,
     return_fields: Optional[Text] = None,
-    start_date: Optional[Text] = None,
-    end_date: Optional[Text] = None,
+    start_date: Optional[Text] = '',
+    end_date: Optional[Text] = '',
     max_entries: Optional[int] = None,
     indices: Optional[List[Text]] = None) -> pd.DataFrame:
   """Return back a data frame from a Timesketch query.
@@ -514,20 +526,8 @@ def query_timesketch(
   else:
     query_filter['indices'] = '_all'
 
-  date_string = ''
-  if start_date and end_date:
-    date_string = f'{start_date},{end_date}'
-  elif start_date:
-    date_string = f'{start_date},'
-  else:
-    date_string = f',{end_date}'
-
-  if date_string:
-    query_filter.setdefaults('chips', [])
-    query_filter['chips'].append({
-        'field': '',
-        'type': 'datetime_range',
-        'value': date_string})
+  if start_date or end_date:
+    _add_date_chip(query_filter, start_date, end_date)
 
   # If view is being sent in, view needs to be the only parameter to the search.
   if view is not None:
@@ -570,8 +570,8 @@ def timesketch_query(
     fields: Optional[Text] = None,
     timelines: Optional[Text] = None,
     view: Optional[api_view.View] = None,
-    start_date: Optional[Text] = None,
-    end_date: Optional[Text] = None,
+    start_date: Optional[Text] = '',
+    end_date: Optional[Text] = '',
     query_filter: Optional[Dict[Text, Any]] = None,
     max_entries: Optional[int] = 40000) -> pd.DataFrame:
   """Run a Timesketch query using a magic.
