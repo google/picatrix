@@ -107,6 +107,7 @@ class State:
       Returns the output object.
     """
     self._last_output = output
+    self._last_magic = magic_name
 
     if bind_to:
       _ = utils.ipython_bind_global(name=bind_to, value=output)
