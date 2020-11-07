@@ -48,9 +48,16 @@ class State:
 
   _cache: Dict[Text, Any] = {}
   _last_output: Any
+  _last_magic: Text
 
   def __init__(self):
     self._last_output = None
+    self._last_magic = ''
+
+  @property
+  def last_magic(self):
+    """A property that returns the last magic that was run."""
+    return self._last_magic
 
   @property
   def last_output(self):
@@ -85,11 +92,13 @@ class State:
       del self._cache[name]
 
   def set_output(
-      self, output: Any, bind_to: Optional[Text] = '') -> Optional[Any]:
+      self, output: Any, magic_name: Text,
+      bind_to: Optional[Text] = '') -> Optional[Any]:
     """Sets an output from a magic and stores it in the namespace if needed.
 
     Args:
       output (object): the output from the magic as executed.
+      magic_name (str): the name of the magic that was used.
       bind_to (str): optional name of a variable. If this is provided
         the output is omitted and variable is stored in the namespace using
         the name provided here.
