@@ -10,6 +10,9 @@ the picatrix library.
 
 Let's explore both.
 
+There is also a second way to explore this document or these instructions,
+through this document or through the [interactive notebook](https://colab.research.google.com/github/google/picatrix/blob/main/notebooks/adding_magic.ipynb)
+
 ## Temporary Registration in a Notebook
 
 Wheter there is a need to register a helper function that will be
@@ -40,7 +43,7 @@ An example would be:
 ```
 @framework.picatrix_magic
 def my_silly_magic(data: Text, magnitude: Optional[int] = 100) -> Text:
-  """This is a silly magic that will really not provide any value.
+  """Returns a string to demonstrate how to construct a magic.
 
   Args:
     data (str): This is a string that will be printed back.
