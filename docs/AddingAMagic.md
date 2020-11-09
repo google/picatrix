@@ -15,7 +15,7 @@ through this document or through the [interactive notebook](https://colab.resear
 
 ## Temporary Registration in a Notebook
 
-Wheter there is a need to register a helper function that will be
+Whether there is a need to register a helper function that will be
 very specific to a single notebook and not helpful for the greater
 community or in order to test a function while developin it, having
 the ability to temporarily register a helper function inside a notebook
@@ -57,7 +57,7 @@ def my_silly_magic(data: Text, magnitude: Optional[int] = 100) -> Text:
 
 As you can see in the above description there is a function declaration (def my...)
 that defines the name of the magic. The magic will now be registered as
-`%my_silly_magic`, %%my_silly_magic` and `my_silly_magic_func()`. In both cell
+`%my_silly_magic`, `%%my_silly_magic` and `my_silly_magic_func()`. In both cell
 and line mode the text that is added will be passed in as the data attribute.
 That is defined as a `str` (both by typing and in args section). That means the
 input value will be interpreted as a string. You can pass in the optional
@@ -85,7 +85,7 @@ And that would store the results of the magic into the variable `foobar`, so tha
 it would be:
 
 ```
-foobar = 'This magical magic produced 100 magics of magics of what today is magical\nthis is surely a sorrow of a magic'
+foobar == 'This magical magic produced 100 magics of magics of what today is magical\nthis is surely a sorrow of a magic'
 ```
 
 To pass in the parameters you can do:
@@ -109,7 +109,7 @@ Or you can do it this way:
 That would store the results into a variable called `bar`, so that: 
 
 ```
-bar = 'This magical magic produced 203 magics of foobar
+bar == 'This magical magic produced 203 magics of foobar
 ```
 
 This is all that is required to register the magic temporarily.
