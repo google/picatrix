@@ -33,7 +33,7 @@ active picatrix library.
 
 You can confirm that by creating a new notebook and type in:
 ```
-%picatrixmagics`
+%picatrixmagics
 ```
 
 Picatrix library is already imported and initialized.
