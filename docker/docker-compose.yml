@@ -1,0 +1,15 @@
+version: '3'
+services:
+  picatrix:
+    env_file:
+      - config.env
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "${JUPYTER_PORT}:${JUPYTER_PORT}"
+    restart: on-failure
+    volumes:
+      - ../notebooks/:/usr/local/src/picadata/notebooks
+      - /tmp/:/usr/local/src/picadata/data/
+
