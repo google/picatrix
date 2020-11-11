@@ -27,4 +27,4 @@ jobs:
         pip install -e .
     - name: Run pylint on picatrix and tests
       run: |
-        pipenv run pylint --rcfile=.pylintrc setup.py picatrix
+        pipenv run pylint --rcfile=.pylintrc setup.py picatrix end_to_end_tests

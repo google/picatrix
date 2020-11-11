@@ -1,11 +1,9 @@
 version: '3.6'
 services:
   picatrix:
+    image: us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
     env_file:
       - config.env
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfile
     ports:
       - "${JUPYTER_PORT}:${JUPYTER_PORT}"
     restart: on-failure

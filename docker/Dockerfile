@@ -27,7 +27,8 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 # Create folders and fix permissions.
 RUN useradd picatrix -d /home/picatrix -m
 RUN mkdir -p /usr/local/src/picadata/notebooks
-RUN chmod 755 /usr/local/src/picadata/notebooks
+RUN chmod 777 /usr/local/src/picadata/
+RUN chmod 777 /usr/local/src/picadata/notebooks
 RUN find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \;
 RUN find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
 
