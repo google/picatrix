@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 services:
   picatrix:
     env_file:
@@ -12,4 +12,5 @@ services:
     volumes:
       - ../notebooks/:/usr/local/src/picadata/notebooks
       - /tmp/:/usr/local/src/picadata/data/
+      - ../:/usr/local/src/picatrix/:ro
 
