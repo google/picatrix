@@ -49,8 +49,6 @@ To install picatrix using virtualenv you can use the following commands:
 $ python3 -m venv picatrix_env
 $ source picatrix_env/bin/activate
 $ pip install picatrix
-$ pip install jupyter_http_over_ws
-$ jupyter serverextension enable --py jupyter_http_over_ws
 ```
 
 And then to start picatrix you can either run:
@@ -59,7 +57,15 @@ And then to start picatrix you can either run:
 $ jupyter notebook
 ```
 
-Or if you want to connect from a colab frontend:
+If you want to connect from a colab frontend, then you'll need to run these
+two commands as well:
+
+```shell
+$ pip install jupyter_http_over_ws
+$ jupyter serverextension enable --py jupyter_http_over_ws
+```
+
+And then to run the notebook:
 
 ```shell
 $ jupyter notebook \
