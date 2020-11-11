@@ -32,7 +32,7 @@ class EndToEndTestManager:
 
     Yields:
         tuple: containing:
-            unicode: the uniquely identifying name of the test
+            str: the uniquely identifying name of the test
             type: the test class.
     """
     for test_name, test_class in iter(cls._class_registry.items()):

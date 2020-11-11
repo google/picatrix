@@ -20,7 +20,7 @@ to other services, etC).
 Read the [installation instructions](docs/Installation.md) on the best ways
 to install picatrix.
 
-After installing connect to the Jupyter notebook in your web browser (should open
+After installing, connect to the Jupyter notebook in your web browser (should open
 up automatically). Inside the notebook you need to import the picatrix library
 and initialize it:
 

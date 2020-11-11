@@ -10,8 +10,7 @@ Let's explore both methods:
 ## Docker
 
 The easiest way to install picatrix is via docker. To use it, first
-[install docker](https://docs.docker.com/engine/install/). You may also want to
-make sure you can run docker [sudo-less](https://docs.docker.com/engine/install/linux-postinstall/).
+[install docker](https://docs.docker.com/engine/install/).
 
 To run the docker container use:
 
