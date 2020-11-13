@@ -15,6 +15,8 @@
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 
+from timesketch_api_client import sketch
+
 from . import interface
 from . import manager
 
@@ -24,23 +26,25 @@ class TimesketchTest(interface.BaseEndToEndTest):
 
   NAME = 'timesketch_test'
 
-  def _setup_client(self, ip):
+  def _setup_client(self, ip: TerminalInteractiveShell):
     """Setup the TimesketchAPI object into the IPython session."""
     ip.run_cell(raw_cell='from timesketch_api_client import client')
-    _ = ip.run_cell(raw_cell=(
+    res = ip.run_cell(raw_cell=(
         '_client = client.TimesketchApi(\n'
         '    host_uri="https://demo.timesketch.org",\n'
         '    username="demo",\n'
         '    password="demo",\n'
         '    verify=True,\n'
         '    auth_mode="userpass")'))
-    _ = ip.run_cell(raw_cell=(
+    self.assertions.assertTrue(res.success)
+    res = ip.run_cell(raw_cell=(
         'from picatrix.lib import state\n'
         'state_obj = state.state()\n'
         'state_obj.add_to_cache(\'timesketch_client\', _client)\n'
     ))
+    self.assertions.assertTrue(res.success)
 
-  def _get_sketch(self, ip):
+  def _get_sketch(self, ip: TerminalInteractiveShell) -> sketch.Sketch:
     """Return a sketch object."""
     self._setup_client(ip)
     ip.run_line_magic(magic_name='timesketch_set_active_sketch', line='6')
@@ -48,9 +52,9 @@ class TimesketchTest(interface.BaseEndToEndTest):
 
   def test_get_sketch(self, ip: TerminalInteractiveShell):
     """Test fetching a sketch."""
-    sketch = self._get_sketch(ip)
-    self.assertions.assertEqual(sketch.id, 6)
-    self.assertions.assertEqual(sketch.name, 'Szechuan Sauce - Challenge')
+    sketch_obj = self._get_sketch(ip)
+    self.assertions.assertEqual(sketch_obj.id, 6)
+    self.assertions.assertEqual(sketch_obj.name, 'Szechuan Sauce - Challenge')
 
   def test_list_views(self, ip: TerminalInteractiveShell):
     """Test listing up the available views for a sketch."""
@@ -81,7 +85,7 @@ class TimesketchTest(interface.BaseEndToEndTest):
 
     self.assertions.assertSetEqual(origin_set, expected_set)
 
-  def test_context_date(self, ip):
+  def test_context_date(self, ip: TerminalInteractiveShell):
     """Test querying for contex surrounding a date."""
     _ = self._get_sketch(ip)
     df = ip.run_line_magic(
