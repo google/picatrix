@@ -19,10 +19,14 @@ $ git clone https://github.com/google/picatrix.git
 $ cd picatrix/docker
 ```
 
+*(if you don't have the git client installed you can also download
+the [source code using this link](https://github.com/google/picatrix/archive/main.zip))*
+
 By default the /tmp folder on your host will be mapped into a `data` folder
 on the docker container. If you want to change that and point to another
 folder on your system, edit the file `docker-latest.yml` and change the
-path `/tmp` to a folder of your choosing.
+path `/tmp` to a folder of your choosing (just remember that the folder needs to
+be writable by `any` if you are running a Linux based host).
 
 For instance if you are running this on a Windows system, then you will
 need to change the `/tmp/` to something like `C:\My Folder\Where I store`.
