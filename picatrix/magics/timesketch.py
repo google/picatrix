@@ -620,7 +620,8 @@ def timesketch_query(
 
 @framework.picatrix_magic
 def timesketch_context_date(
-    data: Text, minutes: int, seconds: Optional[int] = 90) -> pd.DataFrame:
+    data: Text, minutes: int, seconds: Optional[int] = 90,
+    fields: Optional[Text] = '') -> pd.DataFrame:
   """Run a Timesketch context query using a magic.
 
   This is a magic to run a context query in Timesketch around a
@@ -633,6 +634,7 @@ def timesketch_context_date(
     minutes (int): number of minutes to include in context.
     seconds (int): number of seconds to include in context, defaults
         to 90 seconds.
+    fields (str): optional list of fields to include in the returned data.
 
   Returns:
     DataFrame containing the all surrounding events.
@@ -643,7 +645,8 @@ def timesketch_context_date(
   if minutes:
     seconds = minutes * 60
 
-  return get_context_date(date, minutes=minutes, seconds=seconds)
+  return get_context_date(
+      date, minutes=minutes, seconds=seconds, return_fields=fields)
 
 
 @framework.picatrix_magic
