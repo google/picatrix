@@ -20,10 +20,12 @@ from typing import Text
 from typing import Tuple
 from typing import Union
 
+import functools
 import pandas
 from IPython import get_ipython
 
 from picatrix.lib import utils
+from picatrix.lib import state
 
 
 class MagicManager:
@@ -142,4 +144,13 @@ class MagicManager:
     cls._magics[magic_name] = function
     function_name = f'{magic_name}_func'
 
-    _ = utils.ipython_bind_global(function_name, function.fn)
+    def capture_output(function, name):
+      """A function decorator to capture the output of a function."""
+      @functools.wraps(function)
+      def wrapper(*args, **kwargs):
+        state_obj = state.state()
+        return state_obj.set_output(function(*args, **kwargs), magic_name=name)
+      return wrapper
+
+    _ = utils.ipython_bind_global(
+        function_name, capture_output(function.fn, function_name))
