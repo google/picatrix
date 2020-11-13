@@ -25,6 +25,7 @@ import logging
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from IPython.testing.globalipapp import start_ipython
+from IPython.testing.globalipapp import get_ipython
 
 
 logger = logging.getLogger('picatrix.e2e_test')
@@ -72,6 +73,9 @@ class BaseEndToEndTest:
         Counter of number of tests and errors.
     """
     ip = start_ipython()
+    if not ip:
+      ip = get_ipython()
+
     ip.run_cell(raw_cell='from picatrix import notebook_init')
     ip.run_cell(raw_cell='notebook_init.init()')
 
