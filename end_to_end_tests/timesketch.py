@@ -40,13 +40,29 @@ class TimesketchTest(interface.BaseEndToEndTest):
         'state_obj.add_to_cache(\'timesketch_client\', _client)\n'
     ))
 
-  def test_get_sketch(self, ip: TerminalInteractiveShell):
-    """Test fetching a sketch."""
+  def _get_sketch(self, ip):
+    """Return a sketch object."""
     self._setup_client(ip)
     ip.run_line_magic(magic_name='timesketch_set_active_sketch', line='6')
-    sketch = ip.run_line_magic(magic_name='timesketch_get_sketch', line='')
+    return ip.run_line_magic(magic_name='timesketch_get_sketch', line='')
+
+  def test_get_sketch(self, ip: TerminalInteractiveShell):
+    """Test fetching a sketch."""
+    sketch = self._get_sketch(ip)
     self.assertions.assertEqual(sketch.id, 6)
     self.assertions.assertEqual(sketch.name, 'Szechuan Sauce - Challenge')
+
+  def test_query(self, ip: TerminalInteractiveShell):
+    """Test fetching a sketch."""
+    _ = self._get_sketch(ip)
+    views = ip.run_line_magic(magic_name='timesketch_list_views', line='')
+    expected_views = set([
+        '18:Szechuan Hits',
+        '19:Szechuan All Hits',
+        '16:email_addresses'])
+    self.assertions.assertEqual(set(views.keys()), expected_views)
+
+
 
 
 manager.EndToEndTestManager.register_test(TimesketchTest)
