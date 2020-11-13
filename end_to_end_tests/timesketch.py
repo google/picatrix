@@ -43,7 +43,8 @@ class TimesketchTest(interface.BaseEndToEndTest):
   def test_get_sketch(self, ip: TerminalInteractiveShell):
     """Test fetching a sketch."""
     self._setup_client(ip)
-    sketch = ip.run_cell('client.get_sketch(6)')
+    ip.run_line_magic(magic_name='timesketch_set_active_sketch', line='6')
+    sketch = ip.run_line_magic(magic_name='timesketch_get_sketch', line='')
     self.assertions.assertEqual(sketch.id, 6)
     self.assertions.assertEqual(sketch.name, 'Szechuan Sauce - Challenge')
 

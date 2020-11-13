@@ -24,8 +24,6 @@ import collections
 import logging
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
-from IPython.testing.globalipapp import start_ipython
-from IPython.testing.globalipapp import get_ipython
 
 
 logger = logging.getLogger('picatrix.e2e_test')
@@ -66,19 +64,12 @@ class BaseEndToEndTest:
     This is a good place to import any data that is needed.
     """
 
-  def run_tests(self) -> collections.Counter:
+  def run_tests(self, ip: TerminalInteractiveShell) -> collections.Counter:
     """Run all test functions from the class.
 
     Returns:
         Counter of number of tests and errors.
     """
-    ip = start_ipython()
-    if not ip:
-      ip = get_ipython()
-
-    ip.run_cell(raw_cell='from picatrix import notebook_init')
-    ip.run_cell(raw_cell='notebook_init.init()')
-
     logger.info('*** %s ***', self.NAME)
     for test_name, test_func in self._get_test_methods():
       self._counter['tests'] += 1
