@@ -145,11 +145,12 @@ class MagicManager:
     function_name = f'{magic_name}_func'
 
     def capture_output(function, name):
-      """A function decorator to capture the output of a function."""
+      """A function that wraps around magic functions to capture output."""
       @functools.wraps(function)
       def wrapper(*args, **kwargs):
+        function_output = function(*args, **kwargs)
         state_obj = state.state()
-        return state_obj.set_output(function(*args, **kwargs), magic_name=name)
+        return state_obj.set_output(function_output, magic_name=name)
       return wrapper
 
     _ = utils.ipython_bind_global(
