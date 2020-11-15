@@ -32,6 +32,10 @@ For instance if you are running this on a Windows system, then you will
 need to change the `/tmp/` to something like `C:\My Folder\Where I store`.
 Also when running on Windows, there is no `sudo` in front of the commands.
 
+You also need to install `docker-compose`, please follow the instructions
+[here](https://docs.docker.com/compose/install/) (the version that is often
+included in your source repo might be too old to properly setup the container).
+
 After that, just run:
 
 ```shell
