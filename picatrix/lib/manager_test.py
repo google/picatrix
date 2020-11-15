@@ -90,7 +90,7 @@ class ManagerTest(unittest.TestCase):
     def other_magic():
       """Could this be it?"""
       return 'true magic'
-    
+
     other_magic.magic_name = 'other_magic'
     other_magic.fn = other_magic
     manager.MagicManager.register_magic(other_magic)
