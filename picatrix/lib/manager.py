@@ -34,7 +34,9 @@ class MagicManager:
   @classmethod
   def clear_magics(cls):
     """Clear all magic registration."""
-    cls._magics = {}
+    magics = list(cls._magics.keys())
+    for magic_name in magics:
+      cls.deregister_magic(magic_name)
 
   @classmethod
   def deregister_magic(cls, magic_name: str):
@@ -76,13 +78,13 @@ class MagicManager:
     return cls._magics.get(magic_name)
 
   @classmethod
-  def get_magic_info(cls, as_pandas: bool = False) -> Union[
+  def get_magic_info(cls, as_pandas: bool = True) -> Union[
       pandas.DataFrame, List[Tuple[str, str]]]:
     """Get a list of all magics.
 
     Args:
       as_pandas (bool): boolean to determine whether to receive the results
-          as a list of tuples or a pandas DataFrame. Defaults to False.
+          as a list of tuples or a pandas DataFrame. Defaults to True.
 
     Returns:
       Either a pandas DataFrame or a list of tuples, depending on the as_pandas
@@ -102,6 +104,7 @@ class MagicManager:
           'function': f'{magic_name}_func',
           'description': description}
       entries.append(magic_dict)
+
     df = pandas.DataFrame(entries)
     return df[
         ['name', 'description', 'line', 'cell', 'function']].sort_values('name')
