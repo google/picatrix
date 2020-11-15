@@ -22,8 +22,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pipenv
-        pip install -r test_requirements.txt
         pipenv install -d
+        pipenv install -r test_requirements.txt
     - name: Test with unittest
       run: |
         pipenv run python -m unittest discover -s picatrix -p '*_test.py'
