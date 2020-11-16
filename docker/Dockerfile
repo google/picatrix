@@ -19,7 +19,6 @@ WORKDIR /home/picatrix
 RUN mkdir -p .ipython/profile_default/startup/
 
 USER root
-#RUN pip install virtualenv
 COPY docker/00-import.py /home/picatrix/.ipython/profile_default/startup/00-import.py
 RUN chown picatrix /home/picatrix/.ipython/profile_default/startup/00-import.py
 USER picatrix
