@@ -21,6 +21,12 @@ cd picatrix/docker
 $ sudo docker-compose --env-file config.env up -d
 ```
 
+To build the container use:
+
+```shell
+$ sudo docker-compose --env-file config.env build
+```
+
 ### Access Picatrix
 
 To access picatrix you need to find the token URL.

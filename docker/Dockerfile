@@ -25,12 +25,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
 # Create folders and fix permissions.
-RUN useradd picatrix -d /home/picatrix -m
-RUN mkdir -p /usr/local/src/picadata/notebooks
-RUN chmod 777 /usr/local/src/picadata/
-RUN chmod 777 /usr/local/src/picadata/notebooks
-RUN find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \;
-RUN find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
+RUN useradd picatrix -d /home/picatrix -m && mkdir -p /usr/local/src/picadata/notebooks && \
+    chmod 777 /usr/local/src/picadata/ && \
+    chmod 777 /usr/local/src/picadata/notebooks && \
+    find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \; && \
+    find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
 
 USER picatrix
 WORKDIR /home/picatrix
@@ -50,10 +49,8 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install picatrix.
-RUN pip install wheel
-RUN pip install --upgrade picatrix
-RUN pip install jupyter_http_over_ws
-RUN jupyter serverextension enable --py jupyter_http_over_ws
+RUN pip install --upgrade wheel picatrix jupyter_http_over_ws && \
+    jupyter serverextension enable --py jupyter_http_over_ws
 
 WORKDIR /usr/local/src/picadata/
 EXPOSE ${JUPYTER_PORT}
