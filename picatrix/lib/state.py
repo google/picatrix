@@ -26,7 +26,7 @@ from picatrix.lib import utils
 logger = logging.getLogger('picatrix.state')
 
 __state = None
-__LOCK = threading.Lock()
+_LOCK = threading.Lock()
 
 
 def state(refresh_state: bool = False):
@@ -34,9 +34,8 @@ def state(refresh_state: bool = False):
   # pylint: disable=global-statement
   # Making sure we have only one state object.
   global __state
-  global __LOCK
 
-  with __LOCK:
+  with _LOCK:
     if refresh_state or __state is None:
       __state = State()
 
@@ -71,7 +70,8 @@ class State:
       name (str): name of the value in the cache.
       value (object): the value to be stored in the cache.
     """
-    self._cache[name] = value
+    with _LOCK:
+      self._cache[name] = value
 
   def get_from_cache(self, name: Text, default: Optional[Any] = None) -> Any:
     """Get a value from the cache.
@@ -84,12 +84,14 @@ class State:
     Returns:
       The value from the cache if it exists, otherwise the default value.
     """
-    return self._cache.get(name, default)
+    with _LOCK:
+      return self._cache.get(name, default)
 
   def remove_from_cache(self, name: Text):
     """Removes a value from the cache if it exists."""
-    if name in self._cache:
-      del self._cache[name]
+    with _LOCK:
+      if name in self._cache:
+        del self._cache[name]
 
   def set_output(
       self, output: Any, magic_name: Text,
@@ -106,11 +108,12 @@ class State:
     Returns:
       Returns the output object.
     """
-    self._last_output = output
-    self._last_magic = magic_name
+    with _LOCK:
+      self._last_output = output
+      self._last_magic = magic_name
 
-    if bind_to:
-      _ = utils.ipython_bind_global(name=bind_to, value=output)
-      return None
+      if bind_to:
+        _ = utils.ipython_bind_global(name=bind_to, value=output)
+        return None
 
-    return output
+      return output
