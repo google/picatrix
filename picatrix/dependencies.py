@@ -25,6 +25,7 @@ DEPENDENCIES = [
     'ipywidgets>=5.1.1',
     'jupyter>=1.0.0',
     'jupyter-http-over-ws>=0.0.8',
+    'networkx>=2.5',
     'MarkupSafe>=1.1.1',
     'nest-asyncio>=1.4.1',
     'notebook>=5.3.0',
