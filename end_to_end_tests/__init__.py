@@ -15,3 +15,4 @@
 
 # Register all tests by importing them.
 from . import basic_test
+from . import timesketch

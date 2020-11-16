@@ -16,6 +16,8 @@
 import time
 from collections import Counter
 
+from IPython.testing.globalipapp import get_ipython
+
 from end_to_end_tests import manager as test_manager
 
 manager = test_manager.EndToEndTestManager()
@@ -25,13 +27,16 @@ counter = Counter()
 if __name__ == '__main__':
   # Sleep to make sure all containers are operational
   time.sleep(30)  # seconds
+  ip = get_ipython()
+  ip.run_cell(raw_cell='from picatrix import notebook_init')
+  ip.run_cell(raw_cell='notebook_init.init()')
 
   for name, cls in manager.get_tests():
     test_class = cls()
     # Prepare the test environment.
     test_class.setup()
     # Run all tests.
-    run_counter = test_class.run_tests()
+    run_counter = test_class.run_tests(ip)
     counter['tests'] += run_counter['tests']
     counter['errors'] += run_counter['errors']
 

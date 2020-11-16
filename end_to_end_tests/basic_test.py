@@ -19,6 +19,27 @@ from . import interface
 from . import manager
 
 
+MAGIC_DEFINITION = (
+    'from typing import Optional\n'
+    'from typing import Text\n'
+    '\n'
+    'from picatrix.lib import framework\n'
+    '\n'
+    '@framework.picatrix_magic\n'
+    'def my_silly_magic(data: Text, magnitude: Optional[int] = 100) -> Text:\n'
+    '  """Return a silly string with no meaningful value.\n'
+    '\n'
+    '  Args:\n'
+    '    data (str): This is a string that will be printed back.\n'
+    '    magnitude (int): A number that will be displayed in the string.\n'
+    '\n'
+    '  Returns:\n'
+    '    A string that basically combines the two options.\n'
+    '  """\n'
+    '  return f"This magical magic produced {magnitude} magics of '
+    '{data.strip()}"\n')
+
+
 class BasicTest(interface.BaseEndToEndTest):
   """End to end tests for query functionality."""
 
@@ -31,5 +52,20 @@ class BasicTest(interface.BaseEndToEndTest):
     self.assertions.assertFalse(magics.empty)
     self.assertions.assertTrue(magics.shape[0] > 10)
 
+  def test_magic_registration(self, ip: TerminalInteractiveShell):
+    """Test registering a magic."""
+    res = ip.run_cell(raw_cell=MAGIC_DEFINITION)
+    self.assertions.assertTrue(res.success)
+
+    magics = ip.run_line_magic(magic_name='picatrixmagics', line='')
+    self.assertions.assertFalse(
+        magics[magics.name == 'my_silly_magic'].empty)
+
+    line = ip.run_line_magic(
+        magic_name='my_silly_magic', line='--magnitude 23 this is my string')
+
+    expected_return = (
+        'This magical magic produced 23 magics of this is my string')
+    self.assertions.assertEqual(line, expected_return)
 
 manager.EndToEndTestManager.register_test(BasicTest)
