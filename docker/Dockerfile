@@ -1,5 +1,3 @@
-# Use the official Docker Hub Ubuntu 18.04 base image
-#FROM ubuntu:20.04
 FROM python:3.8-slim
 
 # Prevent needing to configure debian packages, stopping the setup of
