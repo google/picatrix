@@ -24,6 +24,6 @@ jobs:
         pip install pipenv
         pipenv install -d
         pipenv install -r test_requirements.txt
-    - name: Test with unittest
+    - name: Test with pytest
       run: |
-        pipenv run python -m unittest discover -s picatrix -p '*_test.py'
+        pipenv run pytest
