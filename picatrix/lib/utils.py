@@ -63,7 +63,6 @@ def ipython_bind_global(name: str, value: Any) -> Any:
     Returns the value bound to the given name.
   """
   ip = get_ipython()
-  print(ip)
   if ip and name:
     ip.push({name: value})
   return value
