@@ -22,13 +22,14 @@ from picatrix.lib import utils
 
 manager.get_ipython = mock.MagicMock()
 utils.get_ipython = mock.MagicMock()
-manager.MagicManager.clear_magics()
 
 
 def test_registration():
   """Test registering a magic and getting a copy of it and de-registering."""
+  manager.MagicManager.clear_magics()
 
   def my_magic(cell=None, line=None):
+    """This is a magic."""
     if not cell:
       cell = 'foo'
     if not line:
@@ -68,6 +69,8 @@ def test_registration():
 
 def test_magic_info():
   """Test the get_magic_info."""
+  # Start by clearing the current registration.
+  manager.MagicManager.clear_magics()
   def magical_func():
     """This is a magical function that returns pure magic."""
     return 'magic'
