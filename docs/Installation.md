@@ -26,7 +26,7 @@ By default the /tmp folder on your host will be mapped into a `data` folder
 on the docker container. If you want to change that and point to another
 folder on your system, edit the file `docker-latest.yml` and change the
 path `/tmp` to a folder of your choosing (just remember that the folder needs to
-be writable by `any` if you are running a Linux based host).
+be writable by uid=1000 and/or gid=1000 if you are running a Linux based host).
 
 For instance if you are running this on a Windows system, then you will
 need to change the `/tmp/` to something like `C:\My Folder\Where I store`.
@@ -74,8 +74,18 @@ folder of the container (which is mapped to a folder on the host).
 To upgrade the container using the latest build, you can run:
 
 ```shell
+$ sudo docker-compose -f docker-latest.yml --env-file config.env pull
+$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
+```
+
+You can also manually pull the new image using:
+
+```shell
 $ sudo docker pull us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
 ```
+
+*or if you are using Docker desktop you can find the docker image, click
+on the three dots and select pull*
 
 After updating the image the container needs to be recreated
 
@@ -85,13 +95,6 @@ commands are executed. If you want the notebooks to survive, make sure
 that the notebooks are stored on the host (which means to store them in
 the data folder in the container, which is mapped to a directory on the
 host itself).*
-
-```shell
-$ sudo docker stop docker_picatrix_1
-$ sudo docker rm docker_picatrix_1
-$ cd picatrix/docker
-$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
-```
 
 ## Virtualenv
 
@@ -125,6 +128,17 @@ $ jupyter notebook \
   --port=8888 \
   --NotebookApp.port_retries=0
 ```
+
+After the notebook is started you need to load up picatrix using the code cell:
+
+```python
+from picatrix import notebook_init
+notebook_init.init()
+```
+
+*This also works if you want to connect to the hosted colab runtime. There you
+can simply add a cell with `!pip install --upgrade picatrix` and you should
+be able to start using picatrix.*
 
 ## Confirm Installation
 

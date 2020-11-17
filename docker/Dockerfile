@@ -1,61 +1,38 @@
-# Use the official Docker Hub Ubuntu 18.04 base image
-FROM ubuntu:20.04
-
-# Workaround for bug in setuptools v50.
-# Ref: https://github.com/pypa/setuptools/issues/2350
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
-ENV JUPYTER_PORT=${JUPYTER_PORT}
-
-# Prevent needing to configure debian packages, stopping the setup of
-# the docker container.
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    python3-virtualenv \
-    python3-venv \
-    python3-pip \
-    python3-wheel \
-    python3-setuptools \
-    python3-psycopg2 \
-    git \
-    wget \
-  && rm -rf /var/lib/apt/lists/*
-
-RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
+FROM python:3.8-slim
 
 # Create folders and fix permissions.
-RUN useradd picatrix -d /home/picatrix -m && mkdir -p /usr/local/src/picadata/notebooks && \
+RUN groupadd --gid 1000 picagroup && \
+    useradd picatrix --uid 1000 --gid 1000 -d /home/picatrix -m && \
+    mkdir -p /usr/local/src/picadata/notebooks && \
     chmod 777 /usr/local/src/picadata/ && \
     chmod 777 /usr/local/src/picadata/notebooks && \
     find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \; && \
-    find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
+    find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \; 
 
 USER picatrix
 WORKDIR /home/picatrix
-# TODO: Enable this after fixing permission issues with the runtime file.
-# RUN mkdir -p .local/share/jupyter/runtime/
 RUN mkdir -p .ipython/profile_default/startup/
 
 USER root
 COPY docker/00-import.py /home/picatrix/.ipython/profile_default/startup/00-import.py
 RUN chown picatrix /home/picatrix/.ipython/profile_default/startup/00-import.py
-# TODO: Enable this after fixing permission issues with the runtime file.
-# RUN chmod 777 /home/picatrix/.local/share/jupyter/runtime/
 USER picatrix
 
 ENV VIRTUAL_ENV=/home/picatrix/picenv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install picatrix.
-RUN pip install --upgrade wheel picatrix jupyter_http_over_ws && \
+COPY --chown=1000:1000 . /home/picatrix/code
+RUN pip install --upgrade pip setuptools wheel && \
+    cd /home/picatrix/code && pip install -e . && \
+    pip install --upgrade jupyter_http_over_ws && \
     jupyter serverextension enable --py jupyter_http_over_ws
 
 WORKDIR /usr/local/src/picadata/
+ENV JUPYTER_PORT=${JUPYTER_PORT}
 EXPOSE ${JUPYTER_PORT}
 
 # Run jupyter.
 CMD jupyter notebook --port ${JUPYTER_PORT} \ 
-	--NotebookApp.allow_origin='https://colab.research.google.com' \ 
-	--NotebookApp.port_retries=0 --ip '*'
+    --NotebookApp.allow_origin='https://colab.research.google.com' \ 
+    --NotebookApp.port_retries=0 --ip '*'
