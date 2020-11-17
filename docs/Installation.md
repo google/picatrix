@@ -74,6 +74,13 @@ folder of the container (which is mapped to a folder on the host).
 To upgrade the container using the latest build, you can run:
 
 ```shell
+$ sudo docker-compose -f docker-latest.yml --env-file config.env pull
+$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
+```
+
+You can also manually pull the new image using:
+
+```shell
 $ sudo docker pull us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
 ```
 
@@ -88,12 +95,6 @@ commands are executed. If you want the notebooks to survive, make sure
 that the notebooks are stored on the host (which means to store them in
 the data folder in the container, which is mapped to a directory on the
 host itself).*
-
-```shell
-$ sudo docker stop docker_picatrix_1 && sudo docker rm docker_picatrix_1
-$ cd picatrix/docker
-$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
-```
 
 ## Virtualenv
 
