@@ -1,14 +1,9 @@
 FROM python:3.8-slim
 
-# Prevent needing to configure debian packages, stopping the setup of
-# the docker container.
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
-RUN apt-get update && apt-get install -y --no-install-recommends git \
-  && rm -rf /var/lib/apt/lists/*
-
 # Create folders and fix permissions.
-RUN useradd picatrix -d /home/picatrix -m && mkdir -p /usr/local/src/picadata/notebooks && \
+RUN groupadd --gid 1000 picagroup && \
+    useradd picatrix --uid 1000 --gid 1000 -d /home/picatrix -m && \
+    mkdir -p /usr/local/src/picadata/notebooks && \
     chmod 777 /usr/local/src/picadata/ && \
     chmod 777 /usr/local/src/picadata/notebooks && \
     find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \; && \
@@ -27,9 +22,10 @@ ENV VIRTUAL_ENV=/home/picatrix/picenv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install picatrix.
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install --upgrade picatrix jupyter_http_over_ws && \
+COPY --chown=1000:1000 . /home/picatrix/code
+RUN cd code && pip install -e . && \
+    pip install --upgrade pip setuptools wheel && \
+    pip install --upgrade jupyter_http_over_ws && \
     jupyter serverextension enable --py jupyter_http_over_ws
 
 WORKDIR /usr/local/src/picadata/
