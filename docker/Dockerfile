@@ -32,5 +32,5 @@ EXPOSE ${JUPYTER_PORT}
 
 # Run jupyter.
 CMD jupyter notebook --port ${JUPYTER_PORT} \ 
-    --NotebookApp.allow_origin='https://colab.research.google.com' \ 
+    --NotebookApp.allow_origin_pat='https://colab.[a-z]+.google.com' \ 
     --NotebookApp.port_retries=0 --ip '*'
