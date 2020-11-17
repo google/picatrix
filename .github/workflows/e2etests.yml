@@ -2,6 +2,8 @@ name: picatrix-end-to-end
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  schedule:
+    - cron:  '30 11 * * *'
 jobs:
   test:
     runs-on: ubuntu-latest
