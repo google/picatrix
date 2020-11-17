@@ -23,8 +23,8 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY --chown=1000:1000 . /home/picatrix/code
-RUN cd code && pip install -e . && \
-    pip install --upgrade pip setuptools wheel && \
+RUN pip install --upgrade pip setuptools wheel && \
+    cd /home/picatrix/code && pip install -e . && \
     pip install --upgrade jupyter_http_over_ws && \
     jupyter serverextension enable --py jupyter_http_over_ws
 
