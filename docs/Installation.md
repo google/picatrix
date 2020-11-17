@@ -26,7 +26,7 @@ By default the /tmp folder on your host will be mapped into a `data` folder
 on the docker container. If you want to change that and point to another
 folder on your system, edit the file `docker-latest.yml` and change the
 path `/tmp` to a folder of your choosing (just remember that the folder needs to
-be writable by `any` if you are running a Linux based host).
+be writable by uid=1000 and/or gid=1000 if you are running a Linux based host).
 
 For instance if you are running this on a Windows system, then you will
 need to change the `/tmp/` to something like `C:\My Folder\Where I store`.
@@ -76,6 +76,9 @@ To upgrade the container using the latest build, you can run:
 ```shell
 $ sudo docker pull us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
 ```
+
+*or if you are using Docker desktop you can find the docker image, click
+on the three dots and select pull*
 
 After updating the image the container needs to be recreated
 
