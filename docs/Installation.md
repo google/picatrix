@@ -90,8 +90,7 @@ the data folder in the container, which is mapped to a directory on the
 host itself).*
 
 ```shell
-$ sudo docker stop docker_picatrix_1
-$ sudo docker rm docker_picatrix_1
+$ sudo docker stop docker_picatrix_1 && sudo docker rm docker_picatrix_1
 $ cd picatrix/docker
 $ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
 ```
@@ -128,6 +127,17 @@ $ jupyter notebook \
   --port=8888 \
   --NotebookApp.port_retries=0
 ```
+
+After the notebook is started you need to load up picatrix using the code cell:
+
+```python
+from picatrix import notebook_init
+notebook_init.init()
+```
+
+*This also works if you want to connect to the hosted colab runtime. There you
+can simply add a cell with `!pip install --upgrade picatrix` and you should
+be able to start using picatrix.*
 
 ## Confirm Installation
 
