@@ -22,6 +22,12 @@ $ sudo docker-compose -f docker-build.yml build
 $ sudo docker-compose -f docker-build.yml up -d
 ```
 
+To build the container use:
+
+```shell
+$ sudo docker-compose --env-file config.env build
+```
+
 ### Access Picatrix
 
 To access picatrix you need to start a browser and paste in the following
