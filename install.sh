@@ -5,8 +5,8 @@
 # are correct.
 
 mkdir -p ${HOME}/picadata
-sudo chgrp 1000 ${HOME}/picadata
 cp -r notebooks ${HOME}/picadata/example_notebooks
+sudo chgrp -R 1000 ${HOME}/picadata
 find ${HOME}/picadata -type d -exec chmod 770 {} \;
 find ${HOME}/picadata -type f -exec chmod 660 {} \;
 
