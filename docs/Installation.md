@@ -52,9 +52,11 @@ active picatrix library.
 
 Also remember that all notebooks you create inside the container that are
 not part of the `data` folder, that is that are created inside the container
-itself will be deleted once the container is upgraded. It is therefore
-recommended to create all notebooks that you wish to store inside the `data`
-folder of the container (which is mapped to a folder on the host).
+itself will be **deleted** once the container is upgraded. It is therefore
+recommended to **create all notebooks that you wish to store** inside the `data`
+folder of the container (which is mapped to a folder on the host). Also the
+base folder is now not even writable by the picatrix user, to prevent people
+from accidentally using it.
 
 ### Upgrade Container
 
