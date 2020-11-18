@@ -140,7 +140,25 @@ Picatrix library is already imported and initialized.
 
 ## Connect To Colab
 
+### Using Docker Container
+
 In order to connect to the docker container from colab, select the arrow
 next to the `Connect` button, select `Connect to local runtime` and type
 in the URL `http://localhost:8899/?token=picatrix` into the `Backend URL`
 field and hit `CONNECT`.
+
+### Using Virtualenv
+
+Look at the window where the jupyter notebook is being run from. It should
+have lines similar to this:
+
+```
+    To access the notebook, open this file in a browser:
+    ...
+    Or copy and paste one of these URLs:
+        http://....:8899/?token=...
+     or http://127.0.0.1:8899/?token=...
+```
+
+Copy the URL that is provided there, replace 127.0.0.1 with localhost and enter
+the URL into the `Backend URL` as described in the Docker instructions.
