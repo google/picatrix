@@ -1,9 +1,7 @@
 version: '3.6'
 services:
   picatrix:
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfile
+    image: us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
     ports:
       - 8899:8899
     restart: on-failure

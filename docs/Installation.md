@@ -47,7 +47,7 @@ After that, just run:
 
 ```shell
 $ cd picatrix/docker
-$ sudo docker-compose -f docker-latest.yml up -d
+$ sudo docker-compose up -d
 ```
 
 That will download the latest build and deploy the picatrix docker container.
@@ -63,8 +63,8 @@ active picatrix library.
 To upgrade the container using the latest build, you can run:
 
 ```shell
-$ sudo docker-compose -f docker-latest.yml pull
-$ sudo docker-compose -f docker-latest.yml up -d
+$ sudo docker-compose pull
+$ sudo docker-compose up -d
 ```
 
 You can also manually pull the new image using:

@@ -18,8 +18,8 @@ cd picatrix/docker
 ### Build and Start Containers
 
 ```shell
-$ sudo docker-compose build
-$ sudo docker-compose up -d
+$ sudo docker-compose -f docker-build.yml build
+$ sudo docker-compose -f docker-build.yml up -d
 ```
 
 ### Access Picatrix

@@ -10,9 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up infrastructure with docker-compose
-        run: docker-compose -f docker/docker-compose.yml --env-file docker/config.env up -d
+        run: docker-compose -f docker/docker-build.yml up -d
         env:
           JUPYTER_PORT: 8899
       - name: Run e2e tests
-        run: docker-compose -f docker/docker-compose.yml --env-file docker/config.env exec -e PYTHONPATH="." -w /usr/local/src/picatrix -T picatrix /home/picatrix/picenv/bin/python /usr/local/src/picatrix/end_to_end_tests/tools/run_in_container.py
+        run: docker-compose -f docker/docker-build.yml exec -e PYTHONPATH="." -w /usr/local/src/picatrix -T picatrix /home/picatrix/picenv/bin/python /usr/local/src/picatrix/end_to_end_tests/tools/run_in_container.py
 
