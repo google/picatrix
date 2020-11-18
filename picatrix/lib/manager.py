@@ -13,9 +13,11 @@
 # limitations under the License.
 """Class that defines the manager for all magics."""
 
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Text
 from typing import Tuple
 from typing import Union
@@ -43,6 +45,20 @@ class MagicManager:
   def clear_magics(cls):
     """Clear all magic registration."""
     cls._magics = {}
+
+  @classmethod
+  def deregister_helper(cls, helper_name: str):
+    """Remove a helper from the registration.
+
+    Args:
+      helper_name (str): the name of the helper to remove.
+
+    Raises:
+      KeyError: if the helper is not registered.
+    """
+    if helper_name not in cls._helpers:
+      raise KeyError(f'Helper [{helper_name}] is not registered.')
+    _ = cls._helpers.pop(helper_name)
 
   @classmethod
   def deregister_magic(cls, magic_name: str):
@@ -84,7 +100,28 @@ class MagicManager:
     return cls._magics.get(magic_name)
 
   @classmethod
-  def get_magic_info(cls, as_pandas: bool = False) -> Union[
+  def get_helper_info(cls, as_pandas: Optional[bool] = True) -> Union[
+      pandas.DataFrame, List[Tuple[str, str]]]:
+    """Get a list of all the registered helpers.
+
+    Args:
+      as_pandas (bool): boolean to determine whether to receive the results
+          as a list of tuple or a pandas DataFrame. Defaults to True.
+
+    Returns:
+        Either a pandas DataFrame or a list of tuples, depending on the
+        as_pandas boolean.
+    """
+    if not as_pandas:
+      return [(x, y.get('help', '')) for x, y in cls._helpers.items()]
+
+    lines = []
+    for name, helper_dict in cls._helpers.items():
+      lines.append({'name': name, 'help': helper_dict.get('help', '')})
+    return pandas.DataFrame(lines)
+
+  @classmethod
+  def get_magic_info(cls, as_pandas: Optional[bool] = False) -> Union[
       pandas.DataFrame, List[Tuple[str, str]]]:
     """Get a list of all magics.
 
@@ -128,7 +165,10 @@ class MagicManager:
     if name in cls._helpers:
       raise KeyError(
           f'The helper [{name}] is already registered.')
-    cls._helpers[name] = helper
+    cls._helpers[name] = {
+        'function': helper,
+        'help': helper.__doc__.split('\n')[0],
+    }
 
   @classmethod
   def register_magic(
