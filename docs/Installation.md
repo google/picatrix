@@ -24,12 +24,13 @@ the [source code using this link](https://github.com/google/picatrix/archive/mai
 
 By default the /tmp folder on your host will be mapped into a `data` folder
 on the docker container. If you want to change that and point to another
-folder on your system, edit the file `docker-latest.yml` and change the
-path `/tmp` to a folder of your choosing (just remember that the folder needs to
-be writable by uid=1000 and/or gid=1000 if you are running a Linux based host).
+folder on your system (**highly encouraged**), edit the file `docker-latest.yml`
+and change the path `/tmp` to a folder of your choosing (just remember that the
+folder needs to be writable by uid=1000 and/or gid=1000 if you are running a
+Linux based host).
 
 For instance if you are running this on a Windows system, then you will
-need to change the `/tmp/` to something like `C:\My Folder\Where I store`.
+need to change the `/tmp/` to something like `C:\My Folder\Where I store data`.
 Also when running on Windows, there is no `sudo` in front of the commands.
 
 You also need to install `docker-compose`, please follow the instructions

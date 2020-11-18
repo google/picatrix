@@ -3,11 +3,8 @@ FROM python:3.8-slim
 # Create folders and fix permissions.
 RUN groupadd --gid 1000 picagroup && \
     useradd picatrix --uid 1000 --gid 1000 -d /home/picatrix -m && \
-    mkdir -p /usr/local/src/picadata/notebooks && \
-    chmod 755 /usr/local/src/picadata/ && \
-    chmod 777 /usr/local/src/picadata/notebooks && \
-    find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \; && \
-    find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
+    mkdir -p /usr/local/src/picadata/ && \
+    chmod 777 /usr/local/src/picadata/
 
 USER picatrix
 WORKDIR /home/picatrix
@@ -23,6 +20,7 @@ ENV JUPYTER_PORT=8899
 COPY --chown=1000:1000 docker/00-import.py /home/picatrix/.ipython/profile_default/startup/00-import.py
 COPY --chown=1000:1000 . /home/picatrix/code
 COPY --chown=1000:1000 docker/jupyter_notebook_config.py /home/picatrix/.jupyter/jupyter_notebook_config.py
+COPY --chown=1000:1000 ./notebooks //usr/local/src/picadata/example_notebooks
 
 RUN pip install --upgrade pip setuptools wheel && \
     cd /home/picatrix/code && pip install -e . && \
