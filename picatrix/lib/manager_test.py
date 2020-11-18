@@ -95,7 +95,7 @@ def test_magic_info():
   manager.MagicManager.register_magic(other_magic)
 
   info_df = manager.MagicManager.get_magic_info(as_pandas=True)
-  assert info_df.shape[0] == 3
+  assert len(info_df) == 3
   assert not info_df[info_df.name == 'other_magic'].empty
 
   desc_set = set(info_df.description.unique())

@@ -31,6 +31,7 @@ from picatrix.lib import state
 class MagicManager:
   """Manager class for Picatrix magics."""
 
+  MAGICS_DF_COLUMNS = ['name', 'description', 'line', 'cell', 'function']
   _magics: Dict[Text, Callable[[str, str], str]] = {}
 
   @classmethod
@@ -108,8 +109,7 @@ class MagicManager:
       entries.append(magic_dict)
 
     df = pandas.DataFrame(entries)
-    return df[
-        ['name', 'description', 'line', 'cell', 'function']].sort_values('name')
+    return df[cls.MAGICS_DF_COLUMNS].sort_values('name')
 
   @classmethod
   def register_magic(
