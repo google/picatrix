@@ -32,6 +32,12 @@ class MagicManager:
   """Manager class for Picatrix magics."""
 
   _magics: Dict[Text, Callable[[str, str], str]] = {}
+  _helpers: Dict[Text, Any] = {}
+
+  @classmethod
+  def clear_helpers(cls):
+    """Clear all helper registration."""
+    cls._helpers = {}
 
   @classmethod
   def clear_magics(cls):
@@ -107,6 +113,22 @@ class MagicManager:
     df = pandas.DataFrame(entries)
     return df[
         ['name', 'description', 'line', 'cell', 'function']].sort_values('name')
+
+  @classmethod
+  def register_helper(cls, name: Text, helper: Any):
+    """Register a picatrix helper function.
+
+    Args:
+      name (str): the name of the helper function.
+      helper (function): the helper function to register.
+
+    Raises:
+      KeyError: if the helper is already registered.
+    """
+    if name in cls._helpers:
+      raise KeyError(
+          f'The helper [{name}] is already registered.')
+    cls._helpers[name] = helper
 
   @classmethod
   def register_magic(

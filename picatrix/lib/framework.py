@@ -453,6 +453,20 @@ def _parse_line_string(line: str) -> List[str]:
   return arguments
 
 
+def picatrix_helper(function: Any) -> Any:
+  """Decorator to register a picatrix helper.
+
+  Args:
+    function (function): if the decorator is called without any
+        arguments the helper function is passed to the decorator.
+
+  Returns:
+   The function that was passed in.
+  """
+  manager.MagicManager.register_helper(function.__name__, function)
+  return function
+
+
 def picatrix_magic(
     function: Optional[MagicProtocol] = None,
     arguments: Optional[List[MagicArgument]] = None,
