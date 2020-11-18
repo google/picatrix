@@ -3,34 +3,32 @@ FROM python:3.8-slim
 # Create folders and fix permissions.
 RUN groupadd --gid 1000 picagroup && \
     useradd picatrix --uid 1000 --gid 1000 -d /home/picatrix -m && \
-    mkdir -p /usr/local/src/picadata/notebooks && \
-    chmod 777 /usr/local/src/picadata/ && \
-    chmod 777 /usr/local/src/picadata/notebooks && \
-    find /usr/local/src/picadata/notebooks -type d -exec chmod 777 {} \; && \
-    find /usr/local/src/picadata/notebooks -type f -exec chmod 644 {} \;
+    mkdir -p /usr/local/src/picadata/ && \
+    chmod 777 /usr/local/src/picadata/
 
 USER picatrix
 WORKDIR /home/picatrix
 ENV VIRTUAL_ENV=/home/picatrix/picenv
 
 RUN python3 -m venv $VIRTUAL_ENV && \
-    mkdir -p .ipython/profile_default/startup/
+    mkdir -p .ipython/profile_default/startup/ && \
+    mkdir -p /home/picatrix/.jupyter
 
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-ENV JUPYTER_PORT=${JUPYTER_PORT}
+ENV JUPYTER_PORT=8899
 
 COPY --chown=1000:1000 docker/00-import.py /home/picatrix/.ipython/profile_default/startup/00-import.py
 COPY --chown=1000:1000 . /home/picatrix/code
+COPY --chown=1000:1000 docker/jupyter_notebook_config.py /home/picatrix/.jupyter/jupyter_notebook_config.py
 
 RUN pip install --upgrade pip setuptools wheel && \
     cd /home/picatrix/code && pip install -e . && \
     pip install --upgrade jupyter_http_over_ws && \
+    pip install scikit-learn matplotlib && \
     jupyter serverextension enable --py jupyter_http_over_ws
 
 WORKDIR /usr/local/src/picadata/
-EXPOSE ${JUPYTER_PORT}
+EXPOSE 8899
 
 # Run jupyter.
-CMD jupyter notebook --port ${JUPYTER_PORT} \ 
-    --NotebookApp.allow_origin_pat='https://colab.[a-z]+.google.com' \ 
-    --NotebookApp.port_retries=0 --ip '*'
+ENTRYPOINT ["jupyter", "notebook"]
