@@ -16,7 +16,13 @@ To run the docker container use:
 
 ```shell
 $ git clone https://github.com/google/picatrix.git
-$ cd picatrix/docker
+```
+
+If you are running on a Linux machine you may try to first run the installation
+scrip:
+
+```shell
+$ sh install.sh
 ```
 
 *(if you don't have the git client installed you can also download
@@ -40,6 +46,7 @@ included in your source repo might be too old to properly setup the container).
 After that, just run:
 
 ```shell
+$ cd picatrix/docker
 $ sudo docker-compose -f docker-latest.yml up -d
 ```
 
@@ -50,14 +57,6 @@ window:
 
 You should have a fully working copy of Jupyter running, with an
 active picatrix library.
-
-Also remember that all notebooks you create inside the container that are
-not part of the `data` folder, that is that are created inside the container
-itself will be **deleted** once the container is upgraded. It is therefore
-recommended to **create all notebooks that you wish to store** inside the `data`
-folder of the container (which is mapped to a folder on the host). Also the
-base folder is now not even writable by the picatrix user, to prevent people
-from accidentally using it.
 
 ### Upgrade Container
 
@@ -78,13 +77,6 @@ $ sudo docker pull us-docker.pkg.dev/osdfir-registry/picatrix/picatrix:latest
 on the three dots and select pull*
 
 After updating the image the container needs to be recreated
-
-*warning: all notebooks that are stored inside the container, that is not
-in the `data` folder in the docker container will be lost once these
-commands are executed. If you want the notebooks to survive, make sure
-that the notebooks are stored on the host (which means to store them in
-the data folder in the container, which is mapped to a directory on the
-host itself).*
 
 ## Virtualenv
 
