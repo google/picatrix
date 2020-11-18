@@ -1,16 +1,14 @@
 version: '3.6'
 services:
   picatrix:
-    env_file:
-      - config.env
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
     ports:
-      - "${JUPYTER_PORT}:${JUPYTER_PORT}"
+      - 8899:8899
     restart: on-failure
     volumes:
       - ../notebooks/:/usr/local/src/picadata/notebooks
-      - /tmp/:/usr/local/src/picadata/data/
       - ../:/usr/local/src/picatrix/:ro
+      - /tmp/:/usr/local/src/picadata/data/
 

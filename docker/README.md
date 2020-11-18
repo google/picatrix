@@ -18,29 +18,19 @@ cd picatrix/docker
 ### Build and Start Containers
 
 ```shell
-$ sudo docker-compose --env-file config.env up -d
+$ sudo docker-compose build
+$ sudo docker-compose up -d
 ```
 
 ### Access Picatrix
 
-To access picatrix you need to find the token URL.
+To access picatrix you need to start a browser and paste in the following
+URL: http://localhost:8899/?token=picatrix
 
-```shell
-$ CONTAINER_ID=`sudo docker container list | grep docker_picatrix | awk '{print $1}'`
-$ sudo docker logs $CONTAINER_ID
-...
-    To access the notebook, open this file in a browser:
-        file:///home/picatrix/.local/share/jupyter/runtime/nbserver-6-open.html
-    Or copy and paste one of these URLs:
-        http://....:8899/?token=...
-     or http://127.0.0.1:8899/?token=...
-...
-```
+And you should have a working Jupyter installation with picatrix ready.
 
-And make a copy of the URL that starts with `http://127.0....`
-
-You can paste this URL into a browser and you should have a working Jupyter
-installation with picatrix ready.
+If you want to change the token, edit the file `docker/jupyter_notebook_config.py`
+before building the docker image.
 
 ### Can I get Access to Data?
 

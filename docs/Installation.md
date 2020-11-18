@@ -39,28 +39,15 @@ included in your source repo might be too old to properly setup the container).
 After that, just run:
 
 ```shell
-$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
+$ sudo docker-compose -f docker-latest.yml up -d
 ```
 
 That will download the latest build and deploy the picatrix docker container.
-To be able to connect to picatrix in a jupyter shell, run:
+To be able to connect to picatrix, open the following URL in a browser
+window:
+[http://localhost:8899/?token=picatrix](http://localhost:8899/?token=picatrix)`
 
-```shell
-$ sudo docker logs docker_picatrix_1
-...
-    To access the notebook, open this file in a browser:
-        file:///home/picatrix/.local/share/jupyter/runtime/nbserver-6-open.html
-    Or copy and paste one of these URLs:
-        http://....:8899/?token=...
-     or http://127.0.0.1:8899/?token=...
-...
-```
-
-On Windows you can also use the Docker Desktop client and click the running
-Docker container to get the log window open and copy the URL from there.
-
-Copy the URL that starts with `http://127.0.0.....` and paste it into a browser
-window and you should have a fully working copy of Jupyter running, with an
+You should have a fully working copy of Jupyter running, with an
 active picatrix library.
 
 Also remember that all notebooks you create inside the container that are
@@ -74,8 +61,8 @@ folder of the container (which is mapped to a folder on the host).
 To upgrade the container using the latest build, you can run:
 
 ```shell
-$ sudo docker-compose -f docker-latest.yml --env-file config.env pull
-$ sudo docker-compose -f docker-latest.yml --env-file config.env up -d
+$ sudo docker-compose -f docker-latest.yml pull
+$ sudo docker-compose -f docker-latest.yml up -d
 ```
 
 You can also manually pull the new image using:
@@ -151,13 +138,7 @@ Picatrix library is already imported and initialized.
 
 ## Connect To Colab
 
-In order to use the docker container for colab, you may need to change the URL
-that was provided from:
-
-`http://127.0.0.1:8899/?token=...` to `http://localhost:8899/?token=...`.
-
-*(that is convert the IP address 127.0.0.1 to the domain name localhost)*
-
-Then select the arrow next to the `Connect` button, select `Connect to local
-runtime` and type in the URL with the token value into the `Backend URL`
+In order to connect to the docker container from colab, select the arrow
+next to the `Connect` button, select `Connect to local runtime` and type
+in the URL `http://localhost:8899/?token=picatrix` into the `Backend URL`
 field and hit `CONNECT`.
