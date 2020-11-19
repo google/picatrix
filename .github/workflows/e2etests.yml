@@ -5,8 +5,8 @@ on:
   schedule:
     - cron:  '30 11 * * *'
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  end2end:
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Set up infrastructure with docker-compose
