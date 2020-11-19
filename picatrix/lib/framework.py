@@ -17,6 +17,7 @@ import argparse
 import functools
 import inspect
 import types
+import typing
 
 from typing import Any
 from typing import Callable
@@ -463,7 +464,11 @@ def picatrix_helper(function: Any) -> Any:
   Returns:
    The function that was passed in.
   """
-  manager.MagicManager.register_helper(function.__name__, function)
+  typing_hints = typing.get_type_hints(function)
+  manager.MagicManager.register_helper(
+      name=function.__name__,
+      helper=function,
+      typing_help=typing_hints)
   return function
 
 

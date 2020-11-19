@@ -99,6 +99,11 @@ class MagicManager:
       _ = magics_manager.magics.get('cell').pop(magic_name)
 
   @classmethod
+  def get_helper(cls, helper_name: str) -> Optional[Any]:
+    """Return a helper function from the registration."""
+    return cls._magics.get(helper_name)
+
+  @classmethod
   def get_magic(cls, magic_name: str) -> Callable[[str, str], str]:
     """Return a magic function from the registration."""
     return cls._magics.get(magic_name)
@@ -121,7 +126,11 @@ class MagicManager:
 
     lines = []
     for name, helper_dict in cls._helpers.items():
-      lines.append({'name': name, 'help': helper_dict.get('help', '')})
+      lines.append({
+          'name': name,
+          'help': helper_dict.get('help', ''),
+          'arguments': ','.join(helper_dict.get(types, {}).keys()),
+      })
     return pandas.DataFrame(lines)
 
   @classmethod
@@ -156,12 +165,14 @@ class MagicManager:
     return df[cls.MAGICS_DF_COLUMNS].sort_values('name')
 
   @classmethod
-  def register_helper(cls, name: Text, helper: Any):
+  def register_helper(
+      cls, name: Text, helper: Any, typing_help: Dict[Text, Any]):
     """Register a picatrix helper function.
 
     Args:
       name (str): the name of the helper function.
       helper (function): the helper function to register.
+      typing_help (dict): dict with the arguments and their types.
 
     Raises:
       KeyError: if the helper is already registered.
@@ -172,6 +183,7 @@ class MagicManager:
     cls._helpers[name] = {
         'function': helper,
         'help': helper.__doc__.split('\n')[0],
+        'types': typing_help,
     }
 
   @classmethod

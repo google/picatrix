@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the pixatrix manager."""
+import typing
+
 import pytest
 import mock
 
@@ -110,3 +112,21 @@ def test_magic_info():
   names = [x[0] for  x in entries]
   assert 'other_magic' in names
   assert 'some_magic' in names
+
+
+def test_helper_registration():
+  """Test registering helpers."""
+  def helper_func(stuff: typing.Text):
+    """This is a helper function that helps."""
+    back = f'{stuff}'*3
+    return f'{back}\n\nwasn\'t this helpful?'
+
+  helper_dict = typing.get_type_hints(helper_func)
+  manager.MagicManager.register_helper(
+      name='helper_func', helper=helper_func,
+      typing_help=helper_dict)
+
+  df = manager.MagicManager.get_helper_info()
+  assert not df[df.name == 'helper_func'].empty
+  series = df.set_index('name').loc['helper_func']
+  assert series.arguments == 'stuff'
