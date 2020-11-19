@@ -129,4 +129,4 @@ def test_helper_registration():
   df = manager.MagicManager.get_helper_info()
   assert not df[df.name == 'helper_func'].empty
   series = df.set_index('name').loc['helper_func']
-  assert series.arguments == 'stuff'
+  assert series.arguments == 'stuff [str]'
