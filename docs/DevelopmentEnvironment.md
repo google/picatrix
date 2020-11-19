@@ -46,13 +46,13 @@ Make sure the master branch of your fork is synced with upstream:
 ```shell
 $ git checkout main
 $ git fetch upstream
-$ git rebase upstream/master
+$ git rebase upstream/main
 $ git push
 ```
 
 or in a single command:
 ```shell
-$ git checkout main && git fetch upstream && git rebase upstream/master && git push
+$ git checkout main && git fetch upstream && git rebase upstream/main && git push
 ```
 
 ### Create a feature branch:

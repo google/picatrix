@@ -1,6 +1,9 @@
 # Picatrix
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/google/picatrix/blob/main/notebooks/Quick_Primer_on_Colab_Jupyter.ipynb)
+[![Open In Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/google/picatrix.git/main?filepath=notebooks%2F)
+[![Version](https://img.shields.io/pypi/v/picatrix.svg)](https://pypi.python.org/pypi/picatrix)
+![GitHub e2e Test Status](https://img.shields.io/github/workflow/status/google/picatrix/picatrix-end-to-end)
 
 Picatrix is a framework that is meant to be used within a [Colab](https://colab.research.google.com) or
 [Jupyter](https://jupyter.org/) notebooks. The framework is designed around
