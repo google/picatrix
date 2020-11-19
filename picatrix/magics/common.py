@@ -25,6 +25,30 @@ from picatrix.lib import state
 
 
 @framework.picatrix_magic
+def picatrixhelpers(data: Optional[Text] = '') -> pandas.DataFrame:
+  """Provides information about registered Picatrix helpers.
+
+  Args:
+    data (str): If empty an overview of all registered helpers is provided,
+        otherwise the help message of a particular helper is provided.
+
+  Returns:
+      A pandas DataFrame that contains the names and basic information about
+      every registered helper or information about a single helper if
+      the data string is provided.
+  """
+  info_df = manager.MagicManager.get_helper_info(as_pandas=True)
+  if not data:
+    return info_df
+
+  helper_obj = manager.MagicManager.get_helper(data)
+  if not helper_obj:
+    return pandas.DataFrame()
+
+  return info_df[info_df.name == data.strip()]
+
+
+@framework.picatrix_magic
 def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
   """Provides information about registered Picatrix magics.
 
@@ -34,7 +58,7 @@ def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
 
   Returns:
       A pandas DataFrame that contains the names and basic information about
-      every registered SST magic or information about a single magic if
+      every registered magic or information about a single magic if
       the data string is provided.
   """
   if not data:

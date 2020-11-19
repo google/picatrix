@@ -126,10 +126,17 @@ class MagicManager:
 
     lines = []
     for name, helper_dict in cls._helpers.items():
+      hints = helper_dict.get('types', {})
+      hint_strings = []
+      for key, value in hints.items():
+        value_string = getattr(value, '__name__', str(value))
+        hint_strings.append(f'{key} [{value_string}]')
+      helper_string = ', '.join(hint_strings)
+
       lines.append({
           'name': name,
           'help': helper_dict.get('help', ''),
-          'arguments': ','.join(helper_dict.get('types', {}).keys()),
+          'arguments': helper_string,
       })
     return pandas.DataFrame(lines)
 
