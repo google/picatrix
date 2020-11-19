@@ -129,7 +129,7 @@ class MagicManager:
       lines.append({
           'name': name,
           'help': helper_dict.get('help', ''),
-          'arguments': ','.join(helper_dict.get(types, {}).keys()),
+          'arguments': ','.join(helper_dict.get('types', {}).keys()),
       })
     return pandas.DataFrame(lines)
 
