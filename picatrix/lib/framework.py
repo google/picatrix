@@ -469,6 +469,7 @@ def picatrix_helper(function: Any) -> Any:
       name=function.__name__,
       helper=function,
       typing_help=typing_hints)
+  utils.ipython_bind_global(function.__name__, function)
   return function
 
 
