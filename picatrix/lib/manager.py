@@ -41,6 +41,11 @@ class MagicManager:
   @classmethod
   def clear_helpers(cls):
     """Clear all helper registration."""
+    for helper_name in cls._helpers:
+      try:
+        utils.ipython_remove_global(helper_name)
+      except KeyError:
+        pass
     cls._helpers = {}
 
   @classmethod
@@ -62,7 +67,12 @@ class MagicManager:
     """
     if helper_name not in cls._helpers:
       raise KeyError(f'Helper [{helper_name}] is not registered.')
+
     _ = cls._helpers.pop(helper_name)
+    try:
+      utils.ipython_remove_global(helper_name)
+    except KeyError:
+      pass
 
   @classmethod
   def deregister_magic(cls, magic_name: str):
