@@ -11,7 +11,7 @@ find ${HOME}/picadata -type d -exec chmod 770 {} \;
 find ${HOME}/picadata -type f -exec chmod 660 {} \;
 
 cd docker
-cat docker-latest.yml| sed -e 's/\/tmp\//~\/picadata/g' > docker-tmp.yml
+cat docker-compose.yml| sed -e 's/\/tmp\//~\/picadata/g' > docker-tmp.yml
 sudo docker-compose -f docker-tmp.yml up -d
 rm docker-tmp.yml
 cd ..
