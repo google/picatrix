@@ -22,7 +22,6 @@ from typing import Text
 from typing import Tuple
 from typing import Union
 
-import collections
 from dataclasses import dataclass
 import functools
 import pandas
@@ -35,7 +34,7 @@ from picatrix.lib import state
 @dataclass
 class Helper:
   """Small structure for a helper."""
-  function: Callback[..., Any]
+  function: Callable[..., Any]
   help: Text
   types: Dict[Text, Any]
 

@@ -226,7 +226,8 @@ class _Magic:
     return super(_Magic, self).__getattribute__(name)
 
 
-def _get_arguments_from_arg_lines(arg_lines: List[Text]) -> List[Dict[Text, Text]]:
+def _get_arguments_from_arg_lines(
+    arg_lines: List[Text]) -> List[Dict[Text, Text]]:
   """Return a list of parsed arguments from argument docstring.
 
   Args:
@@ -471,7 +472,7 @@ def picatrix_helper(function: Callable[..., Any]) -> Callable[..., Any]:
       typing_help=typing_hints)
 
   try:
-    _ = ipython_get_global(function.__name__)
+    _ = utils.ipython_get_global(function.__name__)
   except KeyError:
     utils.ipython_bind_global(function.__name__, function)
 
