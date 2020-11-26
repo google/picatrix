@@ -59,7 +59,7 @@ class MagicArgumentParser(argparse.ArgumentParser):
     super(MagicArgumentParser, self).__init__(*args, **kwargs)
     self.storage = {}
 
-  def exit(self, status: Optional[int] = 0, message: Optional[str] = ''):
+  def exit(self, status: Optional[int] = 0, message: Optional[Text] = ''):
     """Exiting method for argument parser.
 
     Args:
@@ -146,7 +146,7 @@ class _Magic:
     self.__doc__ = self.argument_parser.format_help()
 
   # pylint: disable=inconsistent-return-statements
-  def __call__(self, line: str, cell: Optional[str] = None) -> Optional[Any]:
+  def __call__(self, line: Text, cell: Optional[Text] = None) -> Optional[Any]:
     line_magic = cell is None
 
     arguments = _parse_line_string(line)
@@ -213,7 +213,7 @@ class _Magic:
     options = getattr(self.argument_parser, '_option_string_actions', {})
     return list(options.keys())
 
-  def __getattribute__(self, name: str):
+  def __getattribute__(self, name: Text):
     # Overwriting function to behave like a function when called
     # by isinstance, in order to use the inspect module as well as to
     # produce a better help message.
@@ -226,7 +226,7 @@ class _Magic:
     return super(_Magic, self).__getattribute__(name)
 
 
-def _get_arguments_from_arg_lines(arg_lines: List[str]) -> List[Dict[str, str]]:
+def _get_arguments_from_arg_lines(arg_lines: List[Text]) -> List[Dict[Text, Text]]:
   """Return a list of parsed arguments from argument docstring.
 
   Args:
@@ -250,7 +250,7 @@ def _get_arguments_from_arg_lines(arg_lines: List[str]) -> List[Dict[str, str]]:
   return args
 
 
-def _get_argument_lines_from_docstring(lines: List[str]) -> List[str]:
+def _get_argument_lines_from_docstring(lines: List[Text]) -> List[Text]:
   """Return names and types of arguments read from a doc string.
 
   This function takes in a function's docstring and returns back
@@ -375,7 +375,7 @@ def _add_function_arguments_to_parser(
           help=description)
 
 
-def _parse_docstring(function: MagicProtocol) -> List[Dict[str, str]]:
+def _parse_docstring(function: MagicProtocol) -> List[Dict[Text, Text]]:
   """Return a list of arguments extracted from a function's docstring.
 
   Args:
@@ -394,7 +394,7 @@ def _parse_docstring(function: MagicProtocol) -> List[Dict[str, str]]:
   return _get_arguments_from_arg_lines(arg_lines)
 
 
-def _parse_line_string(line: str) -> List[str]:
+def _parse_line_string(line: Text) -> List[Text]:
   """Return a list of arguments from a line magic.
 
   Args:
@@ -454,7 +454,7 @@ def _parse_line_string(line: str) -> List[str]:
   return arguments
 
 
-def picatrix_helper(function: Any) -> Any:
+def picatrix_helper(function: Callable[..., Any]) -> Callable[..., Any]:
   """Decorator to register a picatrix helper.
 
   Args:
@@ -469,7 +469,12 @@ def picatrix_helper(function: Any) -> Any:
       name=function.__name__,
       helper=function,
       typing_help=typing_hints)
-  utils.ipython_bind_global(function.__name__, function)
+
+  try:
+    _ = ipython_get_global(function.__name__)
+  except KeyError:
+    utils.ipython_bind_global(function.__name__, function)
+
   return function
 
 

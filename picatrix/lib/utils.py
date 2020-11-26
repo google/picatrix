@@ -16,12 +16,13 @@ import sys
 
 from typing import Any
 from typing import Optional
+from typing import Text
 
 from IPython import get_ipython
 from IPython.display import clear_output
 
 
-def ask_question(question: str, input_type: Optional[Any] = str) -> Any:
+def ask_question(question: Text, input_type: Optional[Any] = Text) -> Any:
   """Asks a question and returns the answer.
 
   Args:
@@ -52,7 +53,7 @@ def clear_notebook_output():
   clear_output(wait=True)
 
 
-def ipython_bind_global(name: str, value: Any) -> Any:
+def ipython_bind_global(name: Text, value: Any) -> Any:
   """Binds the name to a Python object denoted by value.
 
   Args:
@@ -68,7 +69,7 @@ def ipython_bind_global(name: str, value: Any) -> Any:
   return value
 
 
-def ipython_get_global(name: str) -> Any:
+def ipython_get_global(name: Text) -> Any:
   """Returns the Python object bound to the given name in the user namespace.
 
   Args:
@@ -84,7 +85,7 @@ def ipython_get_global(name: str) -> Any:
   return ip.all_ns_refs[0][name]
 
 
-def ipython_remove_global(name: str):
+def ipython_remove_global(name: Text):
   """Removes a Python object that is bound to the user namespace.
 
   Args:
