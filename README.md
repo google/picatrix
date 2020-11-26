@@ -54,6 +54,26 @@ Each magic has a `--help` parameter or the functions with `_func?`. Eg.
 timesketch_set_active_sketch_func?
 ```
 
+## Examples
+
+To get all sketches, you can use the following magic
+
+```
+%timesketch_get_sketches
+```
+
+For most of the magics you need to set an active sketch
+
+```
+%timesketch_set_active_sketch 1
+```
+
+To query the sketch, the following magic will execute a search and return the results in a pandas dataframe:
+
+```
+%timesketch_query 'message:Another'
+```
+
 ## Discussions
 
 Want to discuss the project, have issues, want new features, join the slack
