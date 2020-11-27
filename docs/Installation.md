@@ -40,6 +40,16 @@ persistent storage for the picatrix container and fetch and start the container.
 It will also create a new file, called `docker/docker-tmp.yml` that defines
 the new location of the mapped data.
 
+If for some reasons the you are not able to create new notebooks, or see
+the example notebooks. Please edit the `docker/docker-tmp.yml` file and
+change the `~/picadata` line to a full path, eg. `/home/foobar/picadata`
+and run:
+
+```shell
+$ sudo docker container stop docker_picatrix_1
+$ sudo docker-compose -f docker/docker-tmp.yml up -d
+```
+
 ### Default Docker Script
 
 If you are not running on a Linux/Mac machine or want to customize the
