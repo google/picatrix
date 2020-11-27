@@ -13,13 +13,16 @@
 # limitations under the License.
 """Class that defines the manager for all magics."""
 
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Text
 from typing import Tuple
 from typing import Union
 
+from dataclasses import dataclass
 import functools
 import pandas
 from IPython import get_ipython
@@ -28,11 +31,31 @@ from picatrix.lib import utils
 from picatrix.lib import state
 
 
+@dataclass
+class Helper:
+  """Small structure for a helper."""
+  function: Callable[..., Any]
+  help: Text
+  types: Dict[Text, Any]
+
+
 class MagicManager:
   """Manager class for Picatrix magics."""
 
   MAGICS_DF_COLUMNS = ['name', 'description', 'line', 'cell', 'function']
-  _magics: Dict[Text, Callable[[str, str], str]] = {}
+
+  _magics: Dict[Text, Callable[[Text, Text], Text]] = {}
+  _helpers: Dict[Text, Helper] = {}
+
+  @classmethod
+  def clear_helpers(cls):
+    """Clear all helper registration."""
+    for helper_name in cls._helpers:
+      try:
+        utils.ipython_remove_global(helper_name)
+      except KeyError:
+        pass
+    cls._helpers = {}
 
   @classmethod
   def clear_magics(cls):
@@ -42,7 +65,26 @@ class MagicManager:
       cls.deregister_magic(magic_name)
 
   @classmethod
-  def deregister_magic(cls, magic_name: str):
+  def deregister_helper(cls, helper_name: Text):
+    """Remove a helper from the registration.
+
+    Args:
+      helper_name (str): the name of the helper to remove.
+
+    Raises:
+      KeyError: if the helper is not registered.
+    """
+    if helper_name not in cls._helpers:
+      raise KeyError(f'Helper [{helper_name}] is not registered.')
+
+    _ = cls._helpers.pop(helper_name)
+    try:
+      utils.ipython_remove_global(helper_name)
+    except KeyError:
+      pass
+
+  @classmethod
+  def deregister_magic(cls, magic_name: Text):
     """Removes a magic from the registration.
 
     Args:
@@ -76,13 +118,50 @@ class MagicManager:
       _ = magics_manager.magics.get('cell').pop(magic_name)
 
   @classmethod
-  def get_magic(cls, magic_name: str) -> Callable[[str, str], str]:
+  def get_helper(cls, helper_name: Text) -> Optional[Callable[..., Any]]:
+    """Return a helper function from the registration."""
+    return cls._magics.get(helper_name)
+
+  @classmethod
+  def get_magic(cls, magic_name: Text) -> Callable[[Text, Text], Text]:
     """Return a magic function from the registration."""
     return cls._magics.get(magic_name)
 
   @classmethod
-  def get_magic_info(cls, as_pandas: bool = True) -> Union[
-      pandas.DataFrame, List[Tuple[str, str]]]:
+  def get_helper_info(cls, as_pandas: Optional[bool] = True) -> Union[
+      pandas.DataFrame, List[Tuple[Text, Text]]]:
+    """Get a list of all the registered helpers.
+
+    Args:
+      as_pandas (bool): boolean to determine whether to receive the results
+          as a list of tuple or a pandas DataFrame. Defaults to True.
+
+    Returns:
+        Either a pandas DataFrame or a list of tuples, depending on the
+        as_pandas boolean.
+    """
+    if not as_pandas:
+      return [(name, helper.help) for name, helper in cls._helpers.items()]
+
+    lines = []
+    for name, helper in cls._helpers.items():
+      hints = helper.types
+      hint_strings = []
+      for key, value in hints.items():
+        value_string = getattr(value, '__name__', str(value))
+        hint_strings.append(f'{key} [{value_string}]')
+      helper_string = ', '.join(hint_strings)
+
+      lines.append({
+          'name': name,
+          'help': helper.help,
+          'arguments': helper_string,
+      })
+    return pandas.DataFrame(lines)
+
+  @classmethod
+  def get_magic_info(cls, as_pandas: Optional[bool] = True) -> Union[
+      pandas.DataFrame, List[Tuple[Text, Text]]]:
     """Get a list of all magics.
 
     Args:
@@ -112,8 +191,33 @@ class MagicManager:
     return df[cls.MAGICS_DF_COLUMNS].sort_values('name')
 
   @classmethod
+  def register_helper(
+      cls, name: Text, helper: Any, typing_help: Dict[Text, Any]):
+    """Register a picatrix helper function.
+
+    Args:
+      name (str): the name of the helper function.
+      helper (function): the helper function to register.
+      typing_help (dict): dict with the arguments and their types.
+
+    Raises:
+      KeyError: if the helper is already registered.
+    """
+    if name in cls._helpers:
+      raise KeyError(
+          f'The helper [{name}] is already registered.')
+    doc_string = helper.__doc__
+    if doc_string:
+      help_string = doc_string.split('\n')[0]
+    else:
+      help_string = 'No help string supplied.'
+
+    cls._helpers[name] = Helper(
+        function=helper, help=help_string, types=typing_help)
+
+  @classmethod
   def register_magic(
-      cls, function: Callable[[str, str], str],
+      cls, function: Callable[[Text, Text], Text],
       conditional: Callable[[], bool] = None):
     """Register magic function as a magic in picatrix.
 

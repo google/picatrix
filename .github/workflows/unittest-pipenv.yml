@@ -1,16 +1,15 @@
-name: pipenv unittests
+name: unittests
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  unittests:
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-20.04, macos-latest]
         python-version: [3.7, 3.8]
 
     steps:
