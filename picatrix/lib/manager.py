@@ -141,11 +141,11 @@ class MagicManager:
         as_pandas boolean.
     """
     if not as_pandas:
-      return [(x, y.get('help', '')) for x, y in cls._helpers.items()]
+      return [(name, helper.help) for name, helper in cls._helpers.items()]
 
     lines = []
-    for name, helper_obj in cls._helpers.items():
-      hints = helper_obj.types
+    for name, helper in cls._helpers.items():
+      hints = helper.types
       hint_strings = []
       for key, value in hints.items():
         value_string = getattr(value, '__name__', str(value))
@@ -154,7 +154,7 @@ class MagicManager:
 
       lines.append({
           'name': name,
-          'help': helper_obj.help,
+          'help': helper.help,
           'arguments': helper_string,
       })
     return pandas.DataFrame(lines)
