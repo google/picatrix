@@ -12,7 +12,8 @@ Let's explore both methods:
 The easiest way to install picatrix is via docker. To use it, first
 [install docker](https://docs.docker.com/engine/install/).
 
-You also need to install `docker-compose`, please follow the instructions
+If you did not install the docker desktop app you may also need to install
+`docker-compose`, please follow the instructions
 [here](https://docs.docker.com/compose/install/) (the version that is often
 included in your source repo might be too old to properly setup the container).
 
@@ -39,6 +40,16 @@ persistent storage for the picatrix container and fetch and start the container.
 
 It will also create a new file, called `docker/docker-tmp.yml` that defines
 the new location of the mapped data.
+
+If for some reasons the you are not able to create new notebooks, or see
+the example notebooks (this may happen on a Mac OS X for instance).
+Please edit the `docker/docker-tmp.yml` file and change the `~/picadata`
+line to a full path, eg. `/home/foobar/picadata` and run:
+
+```shell
+$ sudo docker container stop docker_picatrix_1
+$ sudo docker-compose -f docker/docker-tmp.yml up -d
+```
 
 ### Default Docker Script
 
