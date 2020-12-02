@@ -103,8 +103,10 @@ def _label_search(
 
 
 def connect(
-    ignore_sketch: bool = False,
-    force_switch: bool = False):
+    ignore_sketch: Optional[bool] = False,
+    force_switch: Optional[bool] = False,
+    config_section: Optional[Text] = 'timesketch',
+    token_password: Optional[Text] = ''):
   """Check if Timesketch has been set up and connect if it hasn't.
 
   Args:
@@ -136,7 +138,8 @@ def connect(
         '%timesketch_create_sketch or assign an already existing '
         'one using %timesketch_set_active_sketch <sketch_id>')
 
-  client = config.get_client()
+  client = config.get_client(
+      config_section=config_section, token_password=token_password)
   if not client:
     raise ValueError('Unable to connect to Timesketch')
 
@@ -304,11 +307,18 @@ def get_sketch_details(sketch_id: Optional[int] = 0) -> Text:
   return '\n'.join(return_string_list)
 
 
-def set_active_sketch(sketch_id: int):
+def set_active_sketch(
+    sketch_id: int,
+    section: Optional[Text] = 'timesketch',
+    token_password: Optional[Text] = '',
+    force_switch: Optional[bool] = False):
   """Set the active sketch."""
-  connect(ignore_sketch=True)
-  state_obj = state.state()
+  connect(
+      ignore_sketch=True, config_section=section,
+      token_password=token_password,
+      force_switch=force_switch)
 
+  state_obj = state.state()
   client = state_obj.get_from_cache('timesketch_client')
 
   sketch = client.get_sketch(sketch_id)
@@ -573,8 +583,6 @@ def timesketch_list_saved_searches(
   Returns:
     A dict with a list of available saved searches.
   """
-  logger.warning(
-      'This will soon be deprecated, use %timesketch_list_saved_searches')
   connect()
   state_obj = state.state()
   sketch = state_obj.get_from_cache('timesketch_sketch')
@@ -819,14 +827,25 @@ def timesketch_get_saved_searches(
 
 
 @framework.picatrix_magic
-def timesketch_set_active_sketch(data: Text):
+def timesketch_set_active_sketch(
+    data: Text, reconnect: Optional[bool] = False,
+    token_password: Optional[Text] = '',
+    config_section: Optional[Text] = 'timesketch'):
   """Sets the active sketch.
 
   Args:
     data (str): the sketch ID to set configure Timesketch for.
+    reconnect (bool): optional boolean that forces a new Timesketch
+        client to be created. Defaults to False.
+    token_password (str): optional manual password for the token file.
+    config_section (str): optional section in the timesketchrc file to
+        read the config from. This can be used when the RC file contains
+        information about more than one Timesketch server to connect to.
   """
   sketch_id = int(data.strip(), 10)
-  set_active_sketch(sketch_id)
+  set_active_sketch(
+      sketch_id, section=config_section, token_password=token_password,
+      force_switch=reconnect)
   utils.clear_notebook_output()
 
 
