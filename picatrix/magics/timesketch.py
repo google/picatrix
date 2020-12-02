@@ -165,7 +165,8 @@ def get_context_date(
         that occurred within the timeframe supplied to the function.
   """
   chip = api_search.DateIntervalChip()
-  chip.date = date_string
+  date_object = dateutil.parser.parse(date_string)
+  chip.date = date_object.strftime('%Y-%m-%dT%H:%M:%S%')
 
   if minutes:
     chip.unit = 'm'
@@ -555,7 +556,8 @@ def timesketch_list_views(
 
   return_dict = {}
   for search_obj in sketch.list_saved_searches():
-    return_dict['{0:d}:{1:s}'.format(search_obj.id, search_obj.name)] = search_obj
+    key = '{0:d}:{1:s}'.format(search_obj.id, search_obj.name)
+    return_dict[key] = search_obj
   return return_dict
 
 
@@ -579,7 +581,8 @@ def timesketch_list_saved_searches(
 
   return_dict = {}
   for search_obj in sketch.list_saved_searches():
-    return_dict['{0:d}:{1:s}'.format(search_obj.id, search_obj.name)] = search_obj
+    key = '{0:d}:{1:s}'.format(search_obj.id, search_obj.name)
+    return_dict[key] = search_obj
   return return_dict
 
 
