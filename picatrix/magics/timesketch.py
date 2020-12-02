@@ -311,12 +311,12 @@ def set_active_sketch(
     sketch_id: int,
     section: Optional[Text] = 'timesketch',
     token_password: Optional[Text] = '',
-    force_switch: Optional[bool] = False):
+    reconnect: Optional[bool] = False):
   """Set the active sketch."""
   connect(
       ignore_sketch=True, config_section=section,
       token_password=token_password,
-      force_switch=force_switch)
+      force_switch=reconnect)
 
   state_obj = state.state()
   client = state_obj.get_from_cache('timesketch_client')
@@ -845,7 +845,7 @@ def timesketch_set_active_sketch(
   sketch_id = int(data.strip(), 10)
   set_active_sketch(
       sketch_id, section=config_section, token_password=token_password,
-      force_switch=reconnect)
+      reconnect=reconnect)
   utils.clear_notebook_output()
 
 
