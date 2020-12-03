@@ -312,7 +312,18 @@ def set_active_sketch(
     section: Optional[Text] = 'timesketch',
     token_password: Optional[Text] = '',
     reconnect: Optional[bool] = False):
-  """Set the active sketch."""
+  """Set the active sketch.
+  
+  Args:
+      sketch_id (int): The sketch ID.
+      section (str): Optional name of a configuration section inside
+          the timesketchrc file for server information. Defaults to
+          timesketch.
+      token_password (str): Optional password for the token file, if
+          not provided the value inside the RC file is used.
+      reconnect (bool): Optional value if set refreshes the Timesketch
+          client object.
+  """
   connect(
       ignore_sketch=True, config_section=section,
       token_password=token_password,
@@ -566,7 +577,7 @@ def timesketch_list_views(
 
   return_dict = {}
   for search_obj in sketch.list_saved_searches():
-    key = '{0:d}:{1:s}'.format(search_obj.id, search_obj.name)
+    key = f'{search_obj.id}:{search_obj.name}'
     return_dict[key] = search_obj
   return return_dict
 
@@ -589,7 +600,7 @@ def timesketch_list_saved_searches(
 
   return_dict = {}
   for search_obj in sketch.list_saved_searches():
-    key = '{0:d}:{1:s}'.format(search_obj.id, search_obj.name)
+    key = f'{search_obj.id}:{search_obj.name}'
     return_dict[key] = search_obj
   return return_dict
 
