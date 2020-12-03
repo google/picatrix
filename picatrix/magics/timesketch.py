@@ -23,6 +23,7 @@ import pandas as pd
 from timesketch_api_client import aggregation as api_aggregation
 from timesketch_api_client import config
 from timesketch_api_client import view as api_view
+from timesketch_api_client import search as api_search
 from timesketch_api_client import sketch as api_sketch
 from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
@@ -34,21 +35,7 @@ from picatrix.lib import state
 from picatrix.lib import utils
 
 
-def _add_date_chip(
-    query_filter: Dict[str, Any], start_time: Text, end_time: Text):
-  """Adds a date range chip into a query filter.
-
-  Args:
-    query_filter (dict): the query filter.
-    start_time (str): a date string with the start of the filter.
-    end_time (str): a date string with the end of the filter.
-  """
-  date_string = f'{start_time},{end_time}'
-  query_filter.setdefault('chips', [])
-  query_filter['chips'].append({
-      'field': '',
-      'type': 'datetime_range',
-      'value': date_string})
+logger = logging.getLogger('picatrix.magics.timesketch')
 
 
 def _fix_return_fields(
@@ -116,8 +103,10 @@ def _label_search(
 
 
 def connect(
-    ignore_sketch: bool = False,
-    force_switch: bool = False):
+    ignore_sketch: Optional[bool] = False,
+    force_switch: Optional[bool] = False,
+    config_section: Optional[Text] = 'timesketch',
+    token_password: Optional[Text] = ''):
   """Check if Timesketch has been set up and connect if it hasn't.
 
   Args:
@@ -149,7 +138,8 @@ def connect(
         '%timesketch_create_sketch or assign an already existing '
         'one using %timesketch_set_active_sketch <sketch_id>')
 
-  client = config.get_client()
+  client = config.get_client(
+      config_section=config_section, token_password=token_password)
   if not client:
     raise ValueError('Unable to connect to Timesketch')
 
@@ -177,28 +167,26 @@ def get_context_date(
     pd.DataFrame: returns a data frame with all events in Timesketch
         that occurred within the timeframe supplied to the function.
   """
-  if minutes:
-    seconds = 60 * minutes
-
+  chip = api_search.DateIntervalChip()
   date_object = dateutil.parser.parse(date_string)
-  start_date = date_object - datetime.timedelta(seconds=seconds)
-  end_date = date_object + datetime.timedelta(seconds=seconds)
+  chip.date = date_object.strftime('%Y-%m-%dT%H:%M:%S%')
 
-  start_string = start_date.strftime('%Y-%m-%dT%H:%M:%S%z')
-  end_string = end_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+  if minutes:
+    chip.unit = 'm'
+    chip.before = minutes
+    chip.after = minutes
+  else:
+    chip.unit = 's'
+    chip.before = seconds
+    chip.after = seconds
 
-  query_filter = {
-      'time_start': None,
-      'time_end': None,
-      'indices': ['_all'],
-      'order': 'asc',
-  }
-  _add_date_chip(query_filter, start_string, end_string)
   return_fields = _fix_return_fields(return_fields)
-  return query_timesketch(
+
+  search_obj = query_timesketch(
       '*',
-      return_fields=return_fields,
-      query_filter=query_filter)
+      return_fields=return_fields)
+  search_obj.add_chip(chip)
+  return search_obj
 
 
 def get_context_row(
@@ -319,11 +307,29 @@ def get_sketch_details(sketch_id: Optional[int] = 0) -> Text:
   return '\n'.join(return_string_list)
 
 
-def set_active_sketch(sketch_id: int):
-  """Set the active sketch."""
-  connect(ignore_sketch=True)
-  state_obj = state.state()
+def set_active_sketch(
+    sketch_id: int,
+    section: Optional[Text] = 'timesketch',
+    token_password: Optional[Text] = '',
+    reconnect: Optional[bool] = False):
+  """Set the active sketch.
 
+  Args:
+      sketch_id (int): The sketch ID.
+      section (str): Optional name of a configuration section inside
+          the timesketchrc file for server information. Defaults to
+          timesketch.
+      token_password (str): Optional password for the token file, if
+          not provided the value inside the RC file is used.
+      reconnect (bool): Optional value if set refreshes the Timesketch
+          client object.
+  """
+  connect(
+      ignore_sketch=True, config_section=section,
+      token_password=token_password,
+      force_switch=reconnect)
+
+  state_obj = state.state()
   client = state_obj.get_from_cache('timesketch_client')
 
   sketch = client.get_sketch(sketch_id)
@@ -394,7 +400,7 @@ def timesketch_add_manual_event(
       try:
         elements.CopyFromStringISO8601(date_string)
       except ValueError:
-        logging.error(
+        logger.error(
             'Unable to convert date string, is it really in ISO 8601 format?')
         return {}
     try:
@@ -403,7 +409,7 @@ def timesketch_add_manual_event(
       try:
         elements.CopyFromStringRFC1123(date_string)
       except ValueError:
-        logging.error(
+        logger.error(
             'Unable to convert date string, needs to be in ISO 8601, 1123 or '
             'in the format YYYY-MM-DD hh:mm:ss.######[+-]##:##')
         return {}
@@ -419,7 +425,7 @@ def timesketch_add_manual_event(
     attributes = {}
 
   if not date:
-    logging.error('Unable to convert date string, please check it.')
+    logger.error('Unable to convert date string, please check it.')
     return {}
 
   return sketch.add_event(
@@ -514,53 +520,88 @@ def query_timesketch(
   if all([x is None for x in [query, query_dsl, view]]):
     raise KeyError('Need to provide a query, query_dsl or a view')
 
-  if not query_filter:
-    query_filter = {
-        'time_start': None,
-        'time_end': None,
-        'order': 'asc'
-    }
-
-  if indices:
-    query_filter['indices'] = indices
-  else:
-    query_filter['indices'] = '_all'
-
+  chip = None
   if start_date or end_date:
-    _add_date_chip(query_filter, start_date, end_date)
+    if start_date and end_date:
+      chip = api_search.DateRangeChip()
+      chip.start_time = start_date
+      chip.end_time = end_date
+    else:
+      chip = api_search.DateIntervalChip()
+      if end_date:
+        chip.date = end_date
+      else:
+        chip.date = start_date
 
-  # If view is being sent in, view needs to be the only parameter to the search.
+  search_obj = api_search.Search(sketch)
+
   if view is not None:
-    query = None
-    query_dsl = None
+    logger.warning(
+        'Views will soon be deprecated, please transition to use search '
+        'objects.')
+    search_obj.from_saved(view.id)
+  else:
+    search_obj.from_manual(
+        query_string=query,
+        query_dsl=query_dsl,
+        query_filter=query_filter,
+        max_entries=max_entries)
 
   return_fields = _fix_return_fields(return_fields)
+  if return_fields:
+    search_obj.return_fields = return_fields
 
-  return sketch.explore(
-      query_string=query, query_dsl=query_dsl,
-      query_filter=query_filter, view=view, return_fields=return_fields,
-      max_entries=max_entries, as_pandas=True)
+  if chip:
+    search_obj.add_chip(chip)
+
+  return search_obj
 
 
 # pylint: disable=unused-argument
 @framework.picatrix_magic
 def timesketch_list_views(
-    data: Optional[Text] = '') -> Dict[str, api_view.View]:
+    data: Optional[Text] = '') -> Dict[str, api_search.Search]:
   """List up all available views.
 
   Args:
     data (str): Not used.
 
   Returns:
-    A dict with a list of available views.
+    A dict with a list of available saved searches.
+  """
+  logger.warning(
+      'This will soon be deprecated, use %timesketch_list_saved_searches')
+  connect()
+  state_obj = state.state()
+  sketch = state_obj.get_from_cache('timesketch_sketch')
+
+  return_dict = {}
+  for search_obj in sketch.list_saved_searches():
+    key = f'{search_obj.id}:{search_obj.name}'
+    return_dict[key] = search_obj
+  return return_dict
+
+
+# pylint: disable=unused-argument
+@framework.picatrix_magic
+def timesketch_list_saved_searches(
+    data: Optional[Text] = '') -> Dict[str, api_search.Search]:
+  """List up all available views.
+
+  Args:
+    data (str): Not used.
+
+  Returns:
+    A dict with a list of available saved searches.
   """
   connect()
   state_obj = state.state()
   sketch = state_obj.get_from_cache('timesketch_sketch')
 
   return_dict = {}
-  for view in sketch.list_views():
-    return_dict['{0:d}:{1:s}'.format(view.id, view.name)] = view
+  for search_obj in sketch.list_saved_searches():
+    key = f'{search_obj.id}:{search_obj.name}'
+    return_dict[key] = search_obj
   return return_dict
 
 
@@ -762,16 +803,17 @@ def timesketch_create_sketch(
 
 
 @framework.picatrix_magic
-def timesketch_get_views(data: Optional[Text] = '') -> Dict[str, api_view.View]:
-  """Get all views from an active sketch.
+def timesketch_get_saved_searches(
+      data: Optional[Text] = '') -> Dict[str, api_search.Search]:
+  """Get all saved searches from an active sketch.
 
   Args:
-    data (str): the sketch ID used to fetch views from. Defaults to the
+    data (str): the sketch ID used to fetch saved searches from. Defaults to the
         active sketch.
 
   Returns:
-      Dict that contains View objects (instance of View) as value and the
-      name of the view as the key.
+      Dict that contains Search objects (instance of Search) as value and the
+      name of the Search as the key.
 
   Raises:
     ValueError: if Timesketch is not properly configured.
@@ -792,43 +834,29 @@ def timesketch_get_views(data: Optional[Text] = '') -> Dict[str, api_view.View]:
   if not sketch:
     raise ValueError('No sketch ID provided.')
 
-  return {x.name: x for x in sketch.list_views()}
+  return {x.name: x for x in sketch.list_saved_searches()}
 
 
 @framework.picatrix_magic
-def timesketch_query_view(data: api_view.View) -> pd.DataFrame:
-  """Makes a Timesketch query using the active sketch and a view.
-
-  Args:
-    data (View): the View object to query.
-
-  Returns:
-    DataFrame containing the results of the query in line mode, otherwise None.
-
-  Raises:
-    ValueError: if View object is not presented.
-  """
-  connect()
-  if not data:
-    raise ValueError('No View object passed in.')
-
-  if not is_view_object(data):
-    raise ValueError((
-        'Need to pass in a View object, remember to use curly braces '
-        'surrounding variable names.'))
-
-  return query_timesketch(view=data, max_entries=0)
-
-
-@framework.picatrix_magic
-def timesketch_set_active_sketch(data: Text):
+def timesketch_set_active_sketch(
+    data: Text, reconnect: Optional[bool] = False,
+    token_password: Optional[Text] = '',
+    config_section: Optional[Text] = 'timesketch'):
   """Sets the active sketch.
 
   Args:
     data (str): the sketch ID to set configure Timesketch for.
+    reconnect (bool): optional boolean that forces a new Timesketch
+        client to be created. Defaults to False.
+    token_password (str): optional manual password for the token file.
+    config_section (str): optional section in the timesketchrc file to
+        read the config from. This can be used when the RC file contains
+        information about more than one Timesketch server to connect to.
   """
   sketch_id = int(data.strip(), 10)
-  set_active_sketch(sketch_id)
+  set_active_sketch(
+      sketch_id, section=config_section, token_password=token_password,
+      reconnect=reconnect)
   utils.clear_notebook_output()
 
 

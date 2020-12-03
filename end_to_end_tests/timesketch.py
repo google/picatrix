@@ -56,10 +56,11 @@ class TimesketchTest(interface.BaseEndToEndTest):
     self.assertions.assertEqual(sketch_obj.id, 6)
     self.assertions.assertEqual(sketch_obj.name, 'Szechuan Sauce - Challenge')
 
-  def test_list_views(self, ip: TerminalInteractiveShell):
-    """Test listing up the available views for a sketch."""
+  def test_list_saved_searches(self, ip: TerminalInteractiveShell):
+    """Test listing up the available saved searches for a sketch."""
     _ = self._get_sketch(ip)
-    views = ip.run_line_magic(magic_name='timesketch_list_views', line='')
+    views = ip.run_line_magic(
+        magic_name='timesketch_list_saved_searches', line='')
     expected_views = set([
         '18:Szechuan Hits',
         '19:Szechuan All Hits',
@@ -69,10 +70,11 @@ class TimesketchTest(interface.BaseEndToEndTest):
   def test_query_data(self, ip: TerminalInteractiveShell):
     """Test querying for data in a sketch."""
     _ = self._get_sketch(ip)
-    df = ip.run_line_magic(
+    search_obj = ip.run_line_magic(
         magic_name='timesketch_query', line=(
             '--fields datetime,origin,message,hostname,name secret AND '
             'data_type:"windows:shell_item:file_entry"'))
+    df = search_obj.table
     df_slice = df[df.origin == 'Beth_Secret.lnk']
     self.assertions.assertTrue(df_slice.shape[0] > 0)
     origin_set = set(df.origin.unique())
@@ -88,10 +90,11 @@ class TimesketchTest(interface.BaseEndToEndTest):
   def test_context_date(self, ip: TerminalInteractiveShell):
     """Test querying for contex surrounding a date."""
     _ = self._get_sketch(ip)
-    df = ip.run_line_magic(
+    search_obj = ip.run_line_magic(
         magic_name='timesketch_context_date', line=(
             '--minutes 10 --fields datetime,message,data_type,event_identifier'
             ',username,workstation 2020-09-18T22:24:36'))
+    df = search_obj.table
 
     self.assertions.assertTrue(df.shape[0] > 5000)
     logon_df = df[df.event_identifier == 4624]
