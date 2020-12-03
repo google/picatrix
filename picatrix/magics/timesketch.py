@@ -313,7 +313,7 @@ def set_active_sketch(
     token_password: Optional[Text] = '',
     reconnect: Optional[bool] = False):
   """Set the active sketch.
-  
+
   Args:
       sketch_id (int): The sketch ID.
       section (str): Optional name of a configuration section inside
