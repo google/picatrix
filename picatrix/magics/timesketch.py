@@ -106,6 +106,7 @@ def connect(
     ignore_sketch: Optional[bool] = False,
     force_switch: Optional[bool] = False,
     config_section: Optional[Text] = 'timesketch',
+    confirm_choices: Optional[bool] = False,
     token_password: Optional[Text] = ''):
   """Check if Timesketch has been set up and connect if it hasn't.
 
@@ -113,6 +114,11 @@ def connect(
     ignore_sketch (optional): if set to True sketch check is ignored.
     force_switch (optional): if set to True then a new client will be created,
         irrelevant if another client was stored.
+    confirm_choices (bool): an optional bool. if set to the user is given
+        a choice to change the value for all already configured parameters.
+        This defaults to False.
+    token_password (str): Optional password for the token file, if
+        not provided the value inside the RC file is used.
 
   Raises:
     ValueError: if Timesketch is not properly configured.
@@ -139,7 +145,8 @@ def connect(
         'one using %timesketch_set_active_sketch <sketch_id>')
 
   client = config.get_client(
-      config_section=config_section, token_password=token_password)
+      config_section=config_section, token_password=token_password,
+      confirm_choices=confirm_choices)
   if not client:
     raise ValueError('Unable to connect to Timesketch')
 
@@ -311,6 +318,7 @@ def set_active_sketch(
     sketch_id: int,
     section: Optional[Text] = 'timesketch',
     token_password: Optional[Text] = '',
+    confirm_choices: Optional[bool] = False,
     reconnect: Optional[bool] = False):
   """Set the active sketch.
 
@@ -321,12 +329,16 @@ def set_active_sketch(
           timesketch.
       token_password (str): Optional password for the token file, if
           not provided the value inside the RC file is used.
+      confirm_choices (bool): an optional bool. if set to the user is given
+          a choice to change the value for all already configured parameters.
+          This defaults to False.
       reconnect (bool): Optional value if set refreshes the Timesketch
           client object.
   """
   connect(
       ignore_sketch=True, config_section=section,
       token_password=token_password,
+      confirm_choices=confirm_choices,
       force_switch=reconnect)
 
   state_obj = state.state()
@@ -841,6 +853,7 @@ def timesketch_get_saved_searches(
 def timesketch_set_active_sketch(
     data: Text, reconnect: Optional[bool] = False,
     token_password: Optional[Text] = '',
+    confirm_choices: Optional[bool] = False,
     config_section: Optional[Text] = 'timesketch'):
   """Sets the active sketch.
 
@@ -849,6 +862,9 @@ def timesketch_set_active_sketch(
     reconnect (bool): optional boolean that forces a new Timesketch
         client to be created. Defaults to False.
     token_password (str): optional manual password for the token file.
+    confirm_choices (bool): an optional bool. if set to the user is given
+        a choice to change the value for all already configured parameters.
+        This defaults to False.
     config_section (str): optional section in the timesketchrc file to
         read the config from. This can be used when the RC file contains
         information about more than one Timesketch server to connect to.
@@ -856,7 +872,7 @@ def timesketch_set_active_sketch(
   sketch_id = int(data.strip(), 10)
   set_active_sketch(
       sketch_id, section=config_section, token_password=token_password,
-      reconnect=reconnect)
+      reconnect=reconnect, confirm_choices=confirm_choices)
   utils.clear_notebook_output()
 
 
