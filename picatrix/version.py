@@ -14,7 +14,7 @@
 """Version information for picatrix."""
 
 
-__version__ = '20201125'
+__version__ = '20201204'
 
 
 def get_version():
