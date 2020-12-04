@@ -23,10 +23,12 @@ COPY --chown=1000:1000 docker/jupyter_notebook_config.py /home/picatrix/.jupyter
 
 RUN pip install --upgrade pip setuptools wheel && \
     cd /home/picatrix/code && pip install -e . && \
-    pip install --upgrade ipywidgets jupyter_http_over_ws && \
+    pip install --upgrade ipywidgets jupyter_contrib_nbextensions jupyter_http_over_ws && \
     pip install scikit-learn matplotlib && \
     jupyter serverextension enable --py jupyter_http_over_ws && \
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix
+    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+    jupyter contrib nbextension install --user && \
+    jupyter nbextensions_configurator enable --user
 
 WORKDIR /usr/local/src/picadata/
 EXPOSE 8899
