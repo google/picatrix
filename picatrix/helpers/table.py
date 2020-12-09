@@ -13,13 +13,40 @@
 # limitations under the License.
 """Defines helper functions to display tables or dataframes."""
 
+import ipyaggrid
 import qgrid
 
 from picatrix.lib import framework
 
 
 @framework.picatrix_helper
-def display_table(data_frame, show_toolbar=False, visible_rows=20):
+def display_table(data_frame):
+  """Display a dataframe interactively with a toolbar."""
+  grid_options = {
+      'enableSorting': True,
+      'enableFilter': True,
+      'enableColResize': True,
+      'enableRangeSelection': True,
+  }
+  return ipyaggrid.Grid(
+      grid_data=data_frame,
+      quick_filter=True,
+      show_toggle_edit=False,
+      export_mode='buttons',
+      export_csv=True,
+      export_excel=False,
+      export_to_df=False,
+      theme='ag-theme-balham',
+      show_toggle_delete=False,
+      columns_fit='auto',
+      index=False,
+      grid_options=grid_options,
+      keep_multiindex=True,
+  )
+
+
+@framework.picatrix_helper
+def display_table_qgrid(data_frame, show_toolbar=False, visible_rows=20):
   """Display a dataframe interactively with a toolbar to select."""
   grid_options = {
       'enableColumnReorder': True,

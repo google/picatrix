@@ -41,6 +41,7 @@ DEPENDENCIES = [
     'timesketch-import-client>=20200910',
     'vega>=3.4.0',
     'qgrid>=1.3.1',
+    'ipyaggrid>=0.2.1',
     'xlrd>=1.2.0',
 ]
 

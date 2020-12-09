@@ -29,7 +29,8 @@ RUN pip install --upgrade pip setuptools wheel && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter contrib nbextension install --user && \
     jupyter nbextensions_configurator enable --user && \
-    jupyter nbextension enable --py --user qgrid
+    jupyter nbextension enable --py --user qgrid && \
+    jupyter nbextension enable --py --user ipyaggrid
 
 WORKDIR /usr/local/src/picadata/
 EXPOSE 8899
