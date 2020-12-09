@@ -35,6 +35,7 @@ def display_table(
 
   for column in data_frame.columns:
     pivot_group = column != 'message'
+    hide = False
     if column in hide_columns:
       hide = True
       pivot_group = False
