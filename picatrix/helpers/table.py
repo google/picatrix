@@ -34,7 +34,6 @@ def display_table(data_frame: pandas.DataFrame) -> ipyaggrid.grid.Grid:
       grid_data=data_frame,
       quick_filter=True,
       show_toggle_edit=False,
-      export_mode='buttons',
       export_csv=True,
       export_excel=False,
       export_to_df=False,
