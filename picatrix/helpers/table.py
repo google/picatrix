@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Defines helper functions to display tables or dataframes."""
-from typing import Optional
-
 import pandas
 import ipyaggrid
-import qgrid
 
 from picatrix.lib import framework
 
@@ -24,12 +21,38 @@ from picatrix.lib import framework
 @framework.picatrix_helper
 def display_table(data_frame: pandas.DataFrame) -> ipyaggrid.grid.Grid:
   """Display a dataframe interactively with a toolbar."""
+  column_defs = []
+  for column in data_frame.columns:
+    hide = column.startswith('_')
+    pivot_group = column != 'message'
+    if column in ('_type', '_id', '__ts_emojis', '_index'):
+      hide = True
+      pivot_group = False
+
+    column_dict = {
+        'headerName': column.title(),
+        'field': column,
+        'rowGroup': False,
+        'enableRowGroup': True,
+        'hide': hide,
+        'pivot': pivot_group,
+        'sortable': True,
+        'resizable': True,
+    }
+
+    column_defs.append(column_dict)
+
   grid_options = {
+      'columnDefs' : column_defs,
       'enableSorting': True,
       'enableFilter': True,
       'enableColResize': True,
       'enableRangeSelection': True,
+      'editable': False,
+      'rowGroupPanelShow': 'always',
+      'rowSelection': 'multiple',
   }
+
   return ipyaggrid.Grid(
       grid_data=data_frame,
       quick_filter=True,
@@ -44,28 +67,3 @@ def display_table(data_frame: pandas.DataFrame) -> ipyaggrid.grid.Grid:
       grid_options=grid_options,
       keep_multiindex=True,
   )
-
-
-@framework.picatrix_helper
-def display_table_qgrid(
-    data_frame: pandas.DataFrame, show_toolbar: Optional[bool] = False,
-    visible_rows: Optional[int] = 20) -> qgrid.grid.QgridWidget:
-  """Display a dataframe interactively with a toolbar to select."""
-  grid_options = {
-      'enableColumnReorder': True,
-      'enableTextSelectionOnCells': True,
-      'editable': False,
-      'maxVisibleRows': visible_rows,
-      'highlightSelectedRow': True,
-  }
-
-  column_options = {
-      'editable': False,
-  }
-
-  return qgrid.show_grid(
-      data_frame,
-      precision=5,
-      column_options=column_options,
-      show_toolbar=show_toolbar,
-      grid_options=grid_options)
