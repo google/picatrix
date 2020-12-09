@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Defines helper functions to display tables or dataframes."""
+from typing import Optional
 
+import pandas
 import ipyaggrid
 import qgrid
 
@@ -20,7 +22,7 @@ from picatrix.lib import framework
 
 
 @framework.picatrix_helper
-def display_table(data_frame):
+def display_table(data_frame: pandas.DataFrame) -> ipyaggrid.grid.Grid:
   """Display a dataframe interactively with a toolbar."""
   grid_options = {
       'enableSorting': True,
@@ -46,7 +48,9 @@ def display_table(data_frame):
 
 
 @framework.picatrix_helper
-def display_table_qgrid(data_frame, show_toolbar=False, visible_rows=20):
+def display_table_qgrid(
+    data_frame: pandas.DataFrame, show_toolbar: Optional[bool] = False,
+    visible_rows: Optional[int] = 20) -> qgrid.grid.QgridWidget:
   """Display a dataframe interactively with a toolbar to select."""
   grid_options = {
       'enableColumnReorder': True,
