@@ -26,16 +26,16 @@ DEFAULT_COLUMNS_HIDE = ('_type', '_id', '__ts_emojis', '_index')
 @framework.picatrix_helper
 def display_table(
     data_frame: pandas.DataFrame,
-    hide_column: Optional[Tuple[str]] = None) -> ipyaggrid.grid.Grid:
+    hide_columns: Optional[Tuple[str]] = None) -> ipyaggrid.grid.Grid:
   """Display a dataframe interactively with a toolbar."""
   column_defs = []
 
-  if hide_column is None:
-    hide_column = DEFAULT_COLUMNS_HIDE
+  if hide_columns is None:
+    hide_columns = DEFAULT_COLUMNS_HIDE
 
   for column in data_frame.columns:
     pivot_group = column != 'message'
-    if column in hide_column:
+    if column in hide_columns:
       hide = True
       pivot_group = False
 
