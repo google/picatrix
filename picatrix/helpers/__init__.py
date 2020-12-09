@@ -11,24 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Initialization module for picatrix magics.
+"""Class that loads up all helper libraries."""
 
-When starting a new notebook using picatrix it is enough to do
-
-  from picatrix import notebook_init
-
-  notebook_init.init()
-
-And that would register magics and initialize the notebook to be able
-to take advantage of picatrix magics and helper functions.
-"""
-# pylint: disable=unused-import
-from picatrix import helpers
-from picatrix import magics
-from picatrix.lib import state
-
-
-def init():
-  """Initialize the notebook."""
-  # Initialize the state object.
-  _ = state.state()
+from picatrix.helpers import table

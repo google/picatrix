@@ -24,3 +24,4 @@ vega>=3.4.0
 xlrd>=1.2.0
 typing-extensions==3.7.4.3
 networkx>=2.5
+ipyaggrid>=0.2.1
