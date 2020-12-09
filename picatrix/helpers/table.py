@@ -12,20 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Defines helper functions to display tables or dataframes."""
+from typing import Tuple, Optional
+
 import pandas
 import ipyaggrid
 
 from picatrix.lib import framework
 
 
+DEFAULT_COLUMNS_HIDE = ('_type', '_id', '__ts_emojis', '_index')
+
+
 @framework.picatrix_helper
-def display_table(data_frame: pandas.DataFrame) -> ipyaggrid.grid.Grid:
+def display_table(
+    data_frame: pandas.DataFrame,
+    hide_column: Optional[Tuple[str]] = None) -> ipyaggrid.grid.Grid:
   """Display a dataframe interactively with a toolbar."""
   column_defs = []
+
+  if hide_column is None:
+    hide_column = DEFAULT_COLUMNS_HIDE
+
   for column in data_frame.columns:
-    hide = column.startswith('_')
     pivot_group = column != 'message'
-    if column in ('_type', '_id', '__ts_emojis', '_index'):
+    if column in hide_column:
       hide = True
       pivot_group = False
 
