@@ -77,7 +77,12 @@ To query the sketch, the following magic will execute a search and return the re
 To add a manual event with a function use:
 
 ```
-timesketch_add_manual_event_func('Event description text', attributes=attributesdict)
+timesketch_add_manual_event_func('Eventdescriptiontext', attributes=attributesdict)
+```
+
+Which is the same as:
+```
+%timesketch_add_manual_event Eventdescriptiontext --attributes {{attributesdict}}
 ```
 
 ## Discussions
