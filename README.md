@@ -76,6 +76,9 @@ search_obj = %timesketch_query 'message:Another'
 search_obj.table
 ```
 
+Further documentation on the search object can be [found
+here](https://timesketch.org/developers/api-client/#search-query)
+
 ## Discussions
 
 Want to discuss the project, have issues, want new features, join the slack
