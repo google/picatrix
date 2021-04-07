@@ -74,6 +74,12 @@ To query the sketch, the following magic will execute a search and return the re
 %timesketch_query 'message:Another'
 ```
 
+To add a manual event with a function use:
+
+```
+timesketch_add_manual_event_func('Event description text', attributes=attributesdict)
+```
+
 ## Discussions
 
 Want to discuss the project, have issues, want new features, join the slack
