@@ -22,11 +22,13 @@ import pandas as pd
 
 from timesketch_api_client import aggregation as api_aggregation
 from timesketch_api_client import config
-from timesketch_api_client import view as api_view
+from timesketch_api_client import client as api_client
 from timesketch_api_client import search as api_search
 from timesketch_api_client import sketch as api_sketch
 from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
+from timesketch_api_client import view as api_view
+
 from timesketch_import_client import helper
 from timesketch_import_client import importer
 
@@ -364,6 +366,22 @@ def timesketch_get_sketch(data='') -> api_sketch.Sketch:
   return state_obj.get_from_cache('timesketch_sketch')
 
 
+# pylint: disable=unused-argument
+@framework.picatrix_magic
+def timesketch_get_client(data='') -> api_client.TimesketchApi:
+  """Returns the Timesketch client object.
+
+  Args:
+    data (str): Not used, should be empty but is ignored.
+
+  Returns:
+    The selected client object (instance of api_client.TimesketchApi).
+  """
+  connect()
+  state_obj = state.state()
+  return state_obj.get_from_cache('timesketch_client')
+
+
 @framework.picatrix_magic
 def timesketch_add_manual_event(
     data: Text, timestamp: Optional[int] = 0,
@@ -497,8 +515,8 @@ def query_timesketch(
     start_date: Optional[Text] = '',
     end_date: Optional[Text] = '',
     max_entries: Optional[int] = None,
-    indices: Optional[List[Text]] = None) -> pd.DataFrame:
-  """Return back a data frame from a Timesketch query.
+    indices: Optional[List[Text]] = None) -> api_search.Search:
+  """Return back a search object from a Timesketch query.
 
   Args:
     query (str): the query string to send to Timesketch.
@@ -520,7 +538,7 @@ def query_timesketch(
         will be used.
 
   Returns:
-    A data frame with the results gathered from the query.
+    A search object (api_search.Search) that is pre-configured.
 
   Raises:
     KeyError: if the query is sent in without a query, query_dsl or a view.
@@ -626,8 +644,13 @@ def timesketch_query(
     start_date: Optional[Text] = '',
     end_date: Optional[Text] = '',
     query_filter: Optional[Dict[Text, Any]] = None,
-    max_entries: Optional[int] = 40000) -> pd.DataFrame:
+    max_entries: Optional[int] = 40000) -> api_search.Search:
   """Run a Timesketch query using a magic.
+
+  To get a data frame from the result set, use the `.table` function, eg:
+
+  result = %timesketch_query foobar
+  data_frame = result.table
 
   Args:
     data (str): the Timesketch query.
@@ -647,7 +670,7 @@ def timesketch_query(
         object.
 
   Returns:
-    DataFrame containing the results of the query.
+    A search object (api_search.Search) that is pre-configured.
   """
   connect()
   state_obj = state.state()
