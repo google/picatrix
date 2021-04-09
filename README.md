@@ -68,11 +68,16 @@ For most of the magics you need to set an active sketch
 %timesketch_set_active_sketch 1
 ```
 
-To query the sketch, the following magic will execute a search and return the results in a pandas dataframe:
+To query the sketch, the following magic will execute a search and return the results as a search object,
+that can be easily converted into a pandas dataframe:
 
 ```
-%timesketch_query 'message:Another'
+search_obj = %timesketch_query 'message:Another'
+search_obj.table
 ```
+
+Further documentation on the search object can be [found
+here](https://timesketch.org/developers/api-client/#search-query)
 
 ## Discussions
 
