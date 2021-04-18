@@ -79,6 +79,18 @@ search_obj.table
 Further documentation on the search object can be [found
 here](https://timesketch.org/developers/api-client/#search-query)
 
+
+To add a manual event with a function use:
+
+```
+timesketch_add_manual_event_func('Eventdescriptiontext', attributes=attributesdict)
+```
+
+Which is the same as:
+```
+%timesketch_add_manual_event Eventdescriptiontext --attributes {{attributesdict}}
+```
+
 ## Discussions
 
 Want to discuss the project, have issues, want new features, join the slack
