@@ -18,8 +18,8 @@ pytz>=2020.1
 PyYAML>=5.3.1
 requests>=2.23.0
 requests-oauthlib>=1.3.0
-timesketch-api-client>=20201203
-timesketch-import-client>=20200910
+timesketch-api-client>=20210416
+timesketch-import-client>=20210402
 vega>=3.4.0
 xlrd>=1.2.0
 typing-extensions==3.7.4.3

@@ -27,7 +27,6 @@ from timesketch_api_client import search as api_search
 from timesketch_api_client import sketch as api_sketch
 from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
-from timesketch_api_client import view as api_view
 
 from timesketch_import_client import helper
 from timesketch_import_client import importer
@@ -97,11 +96,15 @@ def _label_search(
   if not return_fields:
     return_fields = '*'
 
-  return sketch.search_by_label(
-      label,
-      return_fields=_fix_return_fields(return_fields),
-      max_entries=max_entries,
-      as_pandas=True)
+  search_obj = api_search.Search(sketch)
+  label_chip = api_search.LabelChip()
+  label_chip.label = label
+  search_obj.add_chip(label_chip)
+  search_obj.return_fields = _fix_return_fields(return_fields)
+  if max_entries:
+    search_obj.max_entries = max_entries
+
+  return search_obj.table
 
 
 def connect(
@@ -173,7 +176,7 @@ def get_context_date(
         return back.
 
   Returns:
-    pd.DataFrame: returns a data frame with all events in Timesketch
+    A search object that is configured to return all the events in Timesketch
         that occurred within the timeframe supplied to the function.
   """
   chip = api_search.DateIntervalChip()
@@ -217,7 +220,7 @@ def get_context_row(
         return back.
 
   Returns:
-    pandas.DataFrame: returns a data frame with all events in Timesketch
+    A search object that is configured to return all the events in Timesketch
         that occurred within the timeframe supplied to the function.
   """
   if not isinstance(row, pd.Series):
@@ -235,31 +238,6 @@ def get_context_row(
   return get_context_date(
       date_string, minutes=minutes, seconds=seconds,
       return_fields=return_fields)
-
-
-def is_view_object(input_object: Any) -> bool:
-  """Returns a boolean whether an object is a view object or not.
-
-  Args:
-    input_object (object): an object that is to be tested whether or
-        not it is a View object.
-
-  Returns:
-    True if it is a View object, False otherwise.
-  """
-  if not hasattr(input_object, 'lazyload_data'):
-    return False
-
-  if not hasattr(input_object, 'query_dsl'):
-    return False
-
-  if not hasattr(input_object, 'name'):
-    return False
-
-  if not hasattr(input_object, 'query_filter'):
-    return False
-
-  return True
 
 
 def format_data_frame_row(
@@ -303,15 +281,8 @@ def get_sketch_details(sketch_id: Optional[int] = 0) -> Text:
   return_string_list.append('Active Timelines:')
 
   for timeline in sketch.list_timelines():
-    objects = timeline.data.get('objects', [])
-    if not objects:
-      continue
-
-    data = objects[0]
-    description = data.get('description', 'No description')
-    created_at = data.get('created_at', 'N/A')
     return_string_list.append(
-        f'{timeline.name} [{description}] -> {created_at}')
+        f'{timeline.name} [{timeline.description}] -> {timeline.index_name}')
 
   return '\n'.join(return_string_list)
 
@@ -485,6 +456,7 @@ def timesketch_upload_file(data: Text, name: Optional[Text] = ''):
     name = first or last
     name = name.replace(' ', '_').replace('-', '_')
 
+  timeline = None
   with importer.ImportStreamer() as streamer:
     streamer.set_sketch(sketch)
     streamer.set_timeline_name(name)
@@ -492,25 +464,30 @@ def timesketch_upload_file(data: Text, name: Optional[Text] = ''):
     # Set the file size to 20Mb before the file is split.
     streamer.set_filesize_threshold(20971520)
     streamer.add_file(data)
+
+    # Force a flush.
+    streamer.flush()
+
     result = streamer.response
+    timeline = streamer.timeline
 
   if not result:
     print('Unable to upload data.')
     return
 
-  for timesketch_object in result.get('objects', []):
-    if not timesketch_object:
-      continue
-    print('Timeline: {0:s}\nStatus: {1:s}'.format(
-        timesketch_object.get('description'),
-        ','.join([x.get('status') for x in timesketch_object.get('status')])))
+  if not timeline.name:
+    print('Unable to get a timeline.')
+    return
+
+  print(
+      f'Timeline: {timeline.name}{timeline.description}\n'
+      f'Status: {timeline.status}')
 
 
 def query_timesketch(
     query: Optional[Text] = None,
     query_dsl: Optional[Text] = None,
     query_filter: Optional[Dict[Text, Any]] = None,
-    view: Optional[api_view.View] = None,
     return_fields: Optional[Text] = None,
     start_date: Optional[Text] = '',
     end_date: Optional[Text] = '',
@@ -521,7 +498,6 @@ def query_timesketch(
   Args:
     query (str): the query string to send to Timesketch.
     query_dsl (str): the query DSL to send to Timesketch.
-    view (api_view.View): View object.
     return_fields (str): string with comma separated names of fields to
         return back.
     start_date (str): a timestamp in the form of
@@ -541,14 +517,14 @@ def query_timesketch(
     A search object (api_search.Search) that is pre-configured.
 
   Raises:
-    KeyError: if the query is sent in without a query, query_dsl or a view.
+    KeyError: if the query is sent in without a query or query_dsl.
   """
   connect()
   state_obj = state.state()
   sketch = state_obj.get_from_cache('timesketch_sketch')
 
-  if all([x is None for x in [query, query_dsl, view]]):
-    raise KeyError('Need to provide a query, query_dsl or a view')
+  if all([x is None for x in [query, query_dsl]]):
+    raise KeyError('Need to provide a query or query_dsl')
 
   chip = None
   if start_date or end_date:
@@ -564,18 +540,11 @@ def query_timesketch(
         chip.date = start_date
 
   search_obj = api_search.Search(sketch)
-
-  if view is not None:
-    logger.warning(
-        'Views will soon be deprecated, please transition to use search '
-        'objects.')
-    search_obj.from_saved(view.id)
-  else:
-    search_obj.from_manual(
-        query_string=query,
-        query_dsl=query_dsl,
-        query_filter=query_filter,
-        max_entries=max_entries)
+  search_obj.from_manual(
+      query_string=query,
+      query_dsl=query_dsl,
+      query_filter=query_filter,
+      max_entries=max_entries)
 
   return_fields = _fix_return_fields(return_fields)
   if return_fields:
@@ -589,34 +558,9 @@ def query_timesketch(
 
 # pylint: disable=unused-argument
 @framework.picatrix_magic
-def timesketch_list_views(
-    data: Optional[Text] = '') -> Dict[str, api_search.Search]:
-  """List up all available views.
-
-  Args:
-    data (str): Not used.
-
-  Returns:
-    A dict with a list of available saved searches.
-  """
-  logger.warning(
-      'This will soon be deprecated, use %timesketch_list_saved_searches')
-  connect()
-  state_obj = state.state()
-  sketch = state_obj.get_from_cache('timesketch_sketch')
-
-  return_dict = {}
-  for search_obj in sketch.list_saved_searches():
-    key = f'{search_obj.id}:{search_obj.name}'
-    return_dict[key] = search_obj
-  return return_dict
-
-
-# pylint: disable=unused-argument
-@framework.picatrix_magic
 def timesketch_list_saved_searches(
     data: Optional[Text] = '') -> Dict[str, api_search.Search]:
-  """List up all available views.
+  """List up all available saved searches.
 
   Args:
     data (str): Not used.
@@ -640,7 +584,6 @@ def timesketch_query(
     data: Text,
     fields: Optional[Text] = None,
     timelines: Optional[Text] = None,
-    view: Optional[api_view.View] = None,
     start_date: Optional[Text] = '',
     end_date: Optional[Text] = '',
     query_filter: Optional[Dict[Text, Any]] = None,
@@ -657,7 +600,6 @@ def timesketch_query(
     fields (str): comma separated list of fields to include in the returned
         data frame.
     timelines (str): comma separated list of the names of the timelines.
-    view (View): the View object.
     start_date (str): start date of the result set in the form of
         YYYY-MM-DDTHH:MM:SS+00:00.
     end_date (str): end date of the result set in the form of
@@ -678,18 +620,14 @@ def timesketch_query(
   if timelines:
     sketch = state_obj.get_from_cache('timesketch_sketch')
     timeline_list = sketch.list_timelines()
-    names = timelines.split(',')
+    names = [x.lower() for x in timelines.split(',')]
     indices = [
-        x.index for x in timeline_list if x.name in names]
+        x.id for x in timeline_list if x.name.lower() in names]
   else:
     indices = None
 
-  if view and not is_view_object(view):
-    raise ValueError('View is not a view instance, but rather [{0:s}]'.format(
-        type(view)))
-
   return query_timesketch(
-      query=data, view=view, return_fields=fields, query_filter=query_filter,
+      query=data, return_fields=fields, query_filter=query_filter,
       indices=indices, start_date=start_date, end_date=end_date,
       max_entries=max_entries)
 
@@ -791,14 +729,14 @@ def timesketch_get_timelines(data: Text) -> Dict[str, api_timeline.Timeline]:
 
 @framework.picatrix_magic
 def timesketch_create_sketch(
-    data: Text, description: Text, set_active: Optional[bool] = False) -> Text:
+    data: Text, description: Text, set_active: Optional[bool] = True) -> Text:
   """Magic to create a new sketch in Timesketch.
 
   Args:
     data (str): name of the new sketch.
     description (str): sketch description.
     set_active (bool): whether to set the newly created sketch as the active
-        one. Defaults to False.
+        one. Defaults to True.
 
   Returns:
     str: response string with sketch IDs.
@@ -935,6 +873,7 @@ def timesketch_upload_data(
   result = None
 
   import_helper = helper.ImportHelper()
+  timeline = None
   with importer.ImportStreamer() as streamer:
     streamer.set_sketch(sketch)
 
@@ -958,18 +897,21 @@ def timesketch_upload_data(
     streamer.set_timeline_name(name)
 
     streamer.add_data_frame(data)
+    streamer.flush()
     result = streamer.response
+    timeline = streamer.timeline
 
   if not result:
     print('Unable to upload data.')
     return
 
-  for timesketch_object in result.get('objects', []):
-    if not timesketch_object:
-      continue
-    print('Timeline: {0:s}\nStatus: {1:s}'.format(
-        timesketch_object.get('description'),
-        ','.join([x.get('status') for x in timesketch_object.get('status')])))
+  if not timeline.name:
+    print('Unable to import the timeline.')
+    return
+
+  print(
+      f'Timeline: [{timeline.id}]{timeline.name} - {timeline.description}\n'
+      f'Status: {timeline.status}')
 
 
 # pylint: disable=unused-argument
