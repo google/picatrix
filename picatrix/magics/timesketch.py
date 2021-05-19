@@ -27,7 +27,6 @@ from timesketch_api_client import search as api_search
 from timesketch_api_client import sketch as api_sketch
 from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
-from timesketch_api_client import view as api_view
 
 from timesketch_import_client import helper
 from timesketch_import_client import importer
@@ -97,8 +96,8 @@ def _label_search(
   if not return_fields:
     return_fields = '*'
 
-  search_obj = search.Search(sketch)
-  label_chip = search.LabelChip()
+  search_obj = api_search.Search(sketch)
+  label_chip = api_search.LabelChip()
   label_chip.label = label
   search_obj.add_chip(label_chip)
   search_obj.return_fields = _fix_return_fields(return_fields)
