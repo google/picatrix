@@ -22,7 +22,7 @@ jobs:
       run: |
         pip install pipenv
         pipenv install -d
-        pipenv install -r test_requirements.txt
+        pipenv install -r requirements_dev.txt
     - name: Test with pytest
       run: |
         pipenv run pytest
