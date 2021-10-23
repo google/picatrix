@@ -1,5 +1,6 @@
 altair>=4.1.0
 click>=7.1.2
+dataclasses>=0.8
 dfdatetime>=20200824
 google-auth>=1.17.2
 google-auth-oauthlib>=0.4.1
@@ -25,3 +26,4 @@ xlrd>=1.2.0
 typing-extensions==3.7.4.3
 networkx>=2.5
 ipyaggrid>=0.2.1
+docstring-parser>=0.12

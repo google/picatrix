@@ -1,0 +1,25 @@
+{
+    "editor.formatOnSave": true,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.testing.pytestArgs": [
+        "picatrix"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./picatrix",
+        "-p",
+        "*_test.py"
+    ],
+    "python.formatting.provider": "yapf",
+    "python.languageServer": "Pylance",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+}

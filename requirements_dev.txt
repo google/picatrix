@@ -1,0 +1,7 @@
+pylint~=2.6.0
+mock~=2.0.0
+coverage~=5.0.2
+pytest~=6.2.5
+isort~=5.8.0
+yapf~=0.31.0
+pre-commit~=2.15.0
