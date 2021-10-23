@@ -1,13 +1,13 @@
 # Configuration file for jupyter-notebook.
 
 ## Use a regular expression for the Access-Control-Allow-Origin header
-#  
+#
 #  Requests from an origin matching the expression will get replies with:
-#  
+#
 #      Access-Control-Allow-Origin: origin
-#  
+#
 #  where `origin` is the origin of the request.
-#  
+#
 #  Ignored if allow_origin is set.
 c.NotebookApp.allow_origin_pat = 'https://colab.[a-z]+.google.com'
 

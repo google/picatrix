@@ -15,12 +15,10 @@
 """Tests for the pixatrix manager."""
 import typing
 
-import pytest
 import mock
+import pytest
 
-from picatrix.lib import manager
-from picatrix.lib import utils
-
+from picatrix.lib import manager, utils
 
 manager.get_ipython = mock.MagicMock()
 utils.get_ipython = mock.MagicMock()
@@ -46,6 +44,7 @@ def test_registration():
   assert magic_from_manager() == 'foobar'
 
   my_magic.magic_name = 'other_magic'
+
   def conditional():
     return False
 
@@ -73,6 +72,7 @@ def test_magic_info():
   """Test the get_magic_info."""
   # Start by clearing the current registration.
   manager.MagicManager.clear_magics()
+
   def magical_func():
     """This is a magical function that returns pure magic."""
     return 'magic'
@@ -84,6 +84,7 @@ def test_magic_info():
   def second_magic():
     """This is even more magic."""
     return 'fab'
+
   second_magic.magic_name = 'some_magic'
   second_magic.fn = second_magic
   manager.MagicManager.register_magic(second_magic)
@@ -101,30 +102,32 @@ def test_magic_info():
   assert not info_df[info_df.name == 'other_magic'].empty
 
   desc_set = set(info_df.description.unique())
-  expected_set = set([
-      'Could this be it?', 'This is even more magic.',
-      'This is a magical function that returns pure magic.'])
+  expected_set = set(
+      [
+          'Could this be it?', 'This is even more magic.',
+          'This is a magical function that returns pure magic.'
+      ])
 
   assert desc_set == expected_set
 
   entries = manager.MagicManager.get_magic_info(as_pandas=False)
   assert len(entries) == 3
-  names = [x[0] for  x in entries]
+  names = [x[0] for x in entries]
   assert 'other_magic' in names
   assert 'some_magic' in names
 
 
 def test_helper_registration():
   """Test registering helpers."""
+
   def helper_func(stuff: typing.Text):
     """This is a helper function that helps."""
-    back = f'{stuff}'*3
+    back = f'{stuff}' * 3
     return f'{back}\n\nwasn\'t this helpful?'
 
   helper_dict = typing.get_type_hints(helper_func)
   manager.MagicManager.register_helper(
-      name='helper_func', helper=helper_func,
-      typing_help=helper_dict)
+      name='helper_func', helper=helper_func, typing_help=helper_dict)
 
   df = manager.MagicManager.get_helper_info()
   assert not df[df.name == 'helper_func'].empty

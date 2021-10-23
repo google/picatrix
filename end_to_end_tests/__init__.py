@@ -14,5 +14,4 @@
 """End to end test module."""
 
 # Register all tests by importing them.
-from . import basic_test
-from . import timesketch
+from . import basic_test, timesketch

@@ -19,9 +19,9 @@ def get_requirements():
   """Returns a list of requirements."""
   requires = dependencies.DEPENDENCIES
 
-  for dependency, condition in dependencies.CONDITIONAL_DEPENDENCIES:
+  for dep, condition in dependencies.CONDITIONAL_DEPENDENCIES:
     if condition:
-      requires.append(dependency)
+      requires.append(dep)
   return requires
 
 

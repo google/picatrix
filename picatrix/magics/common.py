@@ -13,15 +13,11 @@
 # limitations under the License.
 """Class that defines common picatrix magics."""
 
-from typing import Any
-from typing import Optional
-from typing import Text
+from typing import Any, Optional, Text
 
 import pandas
 
-from picatrix.lib import framework
-from picatrix.lib import manager
-from picatrix.lib import state
+from picatrix.lib import framework, manager, state
 
 
 @framework.picatrix_magic
@@ -70,11 +66,15 @@ def picatrixmagics(data: Optional[Text] = '') -> pandas.DataFrame:
     return pandas.DataFrame()
 
   description = magic_obj.__doc__.split('\n')[0]
-  return pandas.DataFrame([{
-      'name': magic_obj.magic_name,
-      'description': description,
-      'function': '{0:s}_func'.format(magic_obj.magic_name),
-      'help': magic_obj.argument_parser.format_help()}])
+  return pandas.DataFrame(
+      [
+          {
+              'name': magic_obj.magic_name,
+              'description': description,
+              'function': '{0:s}_func'.format(magic_obj.magic_name),
+              'help': magic_obj.argument_parser.format_help()
+          }
+      ])
 
 
 # pylint: disable=unused-argument

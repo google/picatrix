@@ -18,23 +18,15 @@ import functools
 import inspect
 import types
 import typing
+from typing import Any, Callable, Dict, List, Optional, Text
 
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Text
 try:
   # Got introduced in python 3.8.
   from typing import Protocol
 except ImportError:
   from typing_extensions import Protocol
 
-from picatrix.lib import error
-from picatrix.lib import manager
-from picatrix.lib import state
-from picatrix.lib import utils
+from picatrix.lib import error, manager, state, utils
 
 
 class MagicProtocol(Protocol):
@@ -86,7 +78,9 @@ class _Magic:
   magic_name: Text
 
   def __init__(
-      self, fn: MagicProtocol, arguments: Optional[List[MagicArgument]] = None,
+      self,
+      fn: MagicProtocol,
+      arguments: Optional[List[MagicArgument]] = None,
       name_func: Optional[Callable[[Text], Text]] = None):
     """Initialize the Picatrix Magic."""
     self.fn = fn
@@ -127,7 +121,8 @@ class _Magic:
 
     try:
       self.argument_parser.add_argument(
-          '--bindto', '-bindto',
+          '--bindto',
+          '-bindto',
           type=str,
           default='',
           action='store',
@@ -138,7 +133,8 @@ class _Magic:
 
     try:
       self.argument_parser.add_argument(
-          'data', nargs='?',
+          'data',
+          nargs='?',
           help=self.argument_parser.storage.get('_data_help', ''))
     except argparse.ArgumentError:
       pass
@@ -154,10 +150,11 @@ class _Magic:
     try:
       options = self.argument_parser.parse_args(arguments)
     except KeyError as e:
-      print((
-          'Unable to parse arguments, with error: {0!s}.\n'
-          'Correct usage is: {1:s}').format(
-              e, self.argument_parser.format_help()))
+      print(
+          (
+              'Unable to parse arguments, with error: {0!s}.\n'
+              'Correct usage is: {1:s}').format(
+                  e, self.argument_parser.format_help()))
       return
     except error.ArgParserNonZeroStatus:
       # When argparser ends execution but without an error this exception
@@ -192,10 +189,11 @@ class _Magic:
             type_string = type(var_obj).__name__
             if (type_string != var_type) and not type_string.endswith(
                 var_type) and not var_type.endswith(type_string):
-              raise KeyError((
-                  'Variable [{0:s}] is not of the correct type [{1:s}] for '
-                  'this magic. Type is: {2!s}').format(
-                      var_name, var_type, type(var_obj)))
+              raise KeyError(
+                  (
+                      'Variable [{0:s}] is not of the correct type [{1:s}] for '
+                      'this magic. Type is: {2!s}').format(
+                          var_name, var_type, type(var_obj)))
           option_dict[key] = var_obj
 
     return_value = self.fn(**option_dict)
@@ -205,9 +203,7 @@ class _Magic:
       bind_to = variable
 
     return state_obj.set_output(
-        output=return_value,
-        magic_name=self.magic_name,
-        bind_to=bind_to)
+        output=return_value, magic_name=self.magic_name, bind_to=bind_to)
 
   def __dir__(self):
     options = getattr(self.argument_parser, '_option_string_actions', {})
@@ -291,7 +287,7 @@ def _get_argument_lines_from_docstring(lines: List[Text]) -> List[Text]:
       arg_lines[-1] = '{0:s} {1:s}'.format(arg_lines[-1], line.strip())
 
     new_index += 1
-    if new_index >= len(lines)-1:
+    if new_index >= len(lines) - 1:
       break
 
   return arg_lines
@@ -364,14 +360,19 @@ def _add_function_arguments_to_parser(
 
     if arg_type == bool:
       parser.add_argument(
-          '--{0:s}'.format(variable), '-{0:s}'.format(variable),
-          dest=variable, action=action,
+          '--{0:s}'.format(variable),
+          '-{0:s}'.format(variable),
+          dest=variable,
+          action=action,
           default=default_values.get(variable),
           help=description)
     else:
       parser.add_argument(
-          '--{0:s}'.format(variable), '-{0:s}'.format(variable),
-          dest=variable, type=arg_type, action='store',
+          '--{0:s}'.format(variable),
+          '-{0:s}'.format(variable),
+          dest=variable,
+          type=arg_type,
+          action='store',
           default=default_values.get(variable),
           help=description)
 
@@ -467,9 +468,7 @@ def picatrix_helper(function: Callable[..., Any]) -> Callable[..., Any]:
   """
   typing_hints = typing.get_type_hints(function)
   manager.MagicManager.register_helper(
-      name=function.__name__,
-      helper=function,
-      typing_help=typing_hints)
+      name=function.__name__, helper=function, typing_help=typing_hints)
 
   try:
     _ = utils.ipython_get_global(function.__name__)
@@ -505,15 +504,13 @@ def picatrix_magic(
     the decorator function.
   """
   if function:
-    magic_function = _Magic(
-        function, name_func=name_func, arguments=arguments)
+    magic_function = _Magic(function, name_func=name_func, arguments=arguments)
     manager.MagicManager.register_magic(magic_function, conditional)
     return magic_function
 
   def wrapper(func):
     """Wrapper for the magic."""
-    magic_function = _Magic(
-        func, name_func=name_func, arguments=arguments)
+    magic_function = _Magic(func, name_func=name_func, arguments=arguments)
 
     manager.MagicManager.register_magic(magic_function, conditional)
     return magic_function

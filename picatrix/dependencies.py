@@ -14,7 +14,6 @@
 """List of dependencies for picatrix."""
 import sys
 
-
 DEPENDENCIES = [
     'altair>=4.1.0',
     'click>=7.1.2',
@@ -44,13 +43,11 @@ DEPENDENCIES = [
     'xlrd>=1.2.0',
 ]
 
-
 # Conditional dependencies define a dependency and then a condition that
 # should return a bool. This bool will then be used to determine whether
 # to include the dependency or not.
 CONDITIONAL_DEPENDENCIES = [
     (
         'typing-extensions==3.7.4.3',
-        (sys.version_info.major == 3 and sys.version_info.minor < 8)
-    ),
+        (sys.version_info.major == 3 and sys.version_info.minor < 8)),
 ]

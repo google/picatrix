@@ -15,9 +15,7 @@
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 
-from . import interface
-from . import manager
-
+from . import interface, manager
 
 MAGIC_DEFINITION = (
     'from typing import Optional\n'
@@ -58,8 +56,7 @@ class BasicTest(interface.BaseEndToEndTest):
     self.assertions.assertTrue(res.success)
 
     magics = ip.run_line_magic(magic_name='picatrixmagics', line='')
-    self.assertions.assertFalse(
-        magics[magics.name == 'my_silly_magic'].empty)
+    self.assertions.assertFalse(magics[magics.name == 'my_silly_magic'].empty)
 
     line = ip.run_line_magic(
         magic_name='my_silly_magic', line='--magnitude 23 this is my string')
@@ -67,5 +64,6 @@ class BasicTest(interface.BaseEndToEndTest):
     expected_return = (
         'This magical magic produced 23 magics of this is my string')
     self.assertions.assertEqual(line, expected_return)
+
 
 manager.EndToEndTestManager.register_test(BasicTest)

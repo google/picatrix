@@ -13,7 +13,6 @@
 # limitations under the License.
 """Version information for picatrix."""
 
-
 __version__ = '20210519'
 
 

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Defines helper functions to display tables or dataframes."""
-from typing import Tuple, Union, Optional
+from typing import Optional, Tuple, Union
 
-import pandas
 import ipyaggrid
+import pandas
 
 try:
   # 3rd party widgets do not work inside colab, we will use the
@@ -26,15 +26,14 @@ except ImportError:
 
 from picatrix.lib import framework
 
-
 DEFAULT_COLUMNS_HIDE = ('_type', '_id', '__ts_emojis', '_index')
 
 
 @framework.picatrix_helper
 def display_table(
     data_frame: pandas.DataFrame,
-    hide_columns: Optional[Tuple[str]] = None) -> Union[
-        ipyaggrid.grid.Grid, DataTable]:
+    hide_columns: Optional[Tuple[str]] = None
+) -> Union[ipyaggrid.grid.Grid, DataTable]:
   """Display a dataframe interactively with a toolbar."""
   if DataTable:
     return DataTable(data_frame, include_index=False)
@@ -65,7 +64,7 @@ def display_table(
     column_defs.append(column_dict)
 
   grid_options = {
-      'columnDefs' : column_defs,
+      'columnDefs': column_defs,
       'enableSorting': True,
       'enableFilter': True,
       'enableColResize': True,
