@@ -17,7 +17,7 @@ RUN python3 -m venv $VIRTUAL_ENV && \
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV JUPYTER_PORT=8899
 
-COPY --chown=1000:1000 docker/00-import.py /home/picatrix/.ipython/profile_default/startup/00-import.py
+COPY --chown=1000:1000 docker/00-import.py /home/picatrix/.ipython/profile_default/startup/notebook_init.py
 COPY --chown=1000:1000 . /home/picatrix/code
 COPY --chown=1000:1000 docker/jupyter_notebook_config.py /home/picatrix/.jupyter/jupyter_notebook_config.py
 
