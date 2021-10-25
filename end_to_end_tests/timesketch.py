@@ -14,11 +14,9 @@
 """End to end tests of common picatrix magics."""
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
-
 from timesketch_api_client import sketch
 
-from . import interface
-from . import manager
+from . import interface, manager
 
 
 class TimesketchTest(interface.BaseEndToEndTest):
@@ -29,19 +27,20 @@ class TimesketchTest(interface.BaseEndToEndTest):
   def _setup_client(self, ip: TerminalInteractiveShell):
     """Setup the TimesketchAPI object into the IPython session."""
     ip.run_cell(raw_cell='from timesketch_api_client import client')
-    res = ip.run_cell(raw_cell=(
-        '_client = client.TimesketchApi(\n'
-        '    host_uri="https://demo.timesketch.org",\n'
-        '    username="demo",\n'
-        '    password="demo",\n'
-        '    verify=True,\n'
-        '    auth_mode="userpass")'))
+    res = ip.run_cell(
+        raw_cell=(
+            '_client = client.TimesketchApi(\n'
+            '    host_uri="https://demo.timesketch.org",\n'
+            '    username="demo",\n'
+            '    password="demo",\n'
+            '    verify=True,\n'
+            '    auth_mode="userpass")'))
     self.assertions.assertTrue(res.success)
-    res = ip.run_cell(raw_cell=(
-        'from picatrix.lib import state\n'
-        'state_obj = state.state()\n'
-        'state_obj.add_to_cache(\'timesketch_client\', _client)\n'
-    ))
+    res = ip.run_cell(
+        raw_cell=(
+            'from picatrix.lib import state\n'
+            'state_obj = state.state()\n'
+            'state_obj.add_to_cache(\'timesketch_client\', _client)\n'))
     self.assertions.assertTrue(res.success)
 
   def _get_sketch(self, ip: TerminalInteractiveShell) -> sketch.Sketch:
@@ -61,29 +60,38 @@ class TimesketchTest(interface.BaseEndToEndTest):
     _ = self._get_sketch(ip)
     views = ip.run_line_magic(
         magic_name='timesketch_list_saved_searches', line='')
-    expected_views = set([
-        '18:Szechuan Hits',
-        '19:Szechuan All Hits',
-        '16:email_addresses'])
+    expected_views = set(
+        [
+            '18:Szechuan Hits',
+            '19:Szechuan All Hits',
+            '16:email_addresses',
+            '128:Wifitask',
+            '140:Windows Crash activity',
+            '139:SSH session view',
+            '138:Sigma Rule matches',
+        ])
     self.assertions.assertEqual(set(views.keys()), expected_views)
 
   def test_query_data(self, ip: TerminalInteractiveShell):
     """Test querying for data in a sketch."""
     _ = self._get_sketch(ip)
     search_obj = ip.run_line_magic(
-        magic_name='timesketch_query', line=(
+        magic_name='timesketch_query',
+        line=(
             '--fields datetime,origin,message,hostname,name secret AND '
             'data_type:"windows:shell_item:file_entry"'))
     df = search_obj.table
     df_slice = df[df.origin == 'Beth_Secret.lnk']
     self.assertions.assertTrue(df_slice.shape[0] > 0)
     origin_set = set(df.origin.unique())
-    expected_set = set([
-        '9b9cdc69c1c24e2b.automaticDestinations-ms', 'Beth_Secret.lnk',
-        'HKEY_CURRENT_USER\\Software\\Classes\\Local Settings\\Software'
-        '\\Microsoft\\Windows\\Shell\\BagMRU\\0\\0\\0',
-        'NoJerry.lnk', 'PortalGunPlans.lnk', 'SECRET_beth.lnk', 'Secret.lnk',
-        'Szechuan Sauce.lnk', 'f01b4d95cf55d32a.automaticDestinations-ms'])
+    expected_set = set(
+        [
+            '9b9cdc69c1c24e2b.automaticDestinations-ms', 'Beth_Secret.lnk',
+            'HKEY_CURRENT_USER\\Software\\Classes\\Local Settings\\Software'
+            '\\Microsoft\\Windows\\Shell\\BagMRU\\0\\0\\0', 'NoJerry.lnk',
+            'PortalGunPlans.lnk', 'SECRET_beth.lnk', 'Secret.lnk',
+            'Szechuan Sauce.lnk', 'f01b4d95cf55d32a.automaticDestinations-ms'
+        ])
 
     self.assertions.assertSetEqual(origin_set, expected_set)
 
@@ -91,7 +99,8 @@ class TimesketchTest(interface.BaseEndToEndTest):
     """Test querying for contex surrounding a date."""
     _ = self._get_sketch(ip)
     search_obj = ip.run_line_magic(
-        magic_name='timesketch_context_date', line=(
+        magic_name='timesketch_context_date',
+        line=(
             '--minutes 10 --fields datetime,message,data_type,event_identifier'
             ',username,workstation 2020-09-18T22:24:36'))
     df = search_obj.table
