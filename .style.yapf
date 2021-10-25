@@ -1,0 +1,11 @@
+# For documentation of these options see
+# https://github.com/google/yapf/blob/HEAD/README.rst
+# based on Fuchsia YAPF config:
+# https://fuchsia.googlesource.com/fuchsia/+/refs/heads/main/.style.yapf
+[style]
+based_on_style = google
+indent_dictionary_value = true
+split_arguments_when_comma_terminated = true
+split_before_first_argument = true
+indent_width = 2
+column_limit = 80

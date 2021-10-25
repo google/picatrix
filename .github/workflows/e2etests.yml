@@ -15,4 +15,3 @@ jobs:
           JUPYTER_PORT: 8899
       - name: Run e2e tests
         run: docker-compose -f docker/docker-build.yml exec -e PYTHONPATH="." -w /usr/local/src/picatrix -T picatrix /home/picatrix/picenv/bin/python /usr/local/src/picatrix/end_to_end_tests/tools/run_in_container.py
-

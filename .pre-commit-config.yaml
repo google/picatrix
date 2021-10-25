@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/pre-commit/mirrors-yapf
+    rev: "v0.31.0"
+    hooks:
+      - id: yapf
+        args: ["--style=.style.yapf", "--parallel", "--in-place"]
+  - repo: https://github.com/asottile/seed-isort-config
+    rev: v2.2.0
+    hooks:
+      - id: seed-isort-config
+  - repo: https://github.com/pycqa/isort
+    rev: 5.9.3
+    hooks:
+      - id: isort
+        name: isort (python)
+        verbose: true
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        args: [picatrix]
+        language: system
+        types: [python]
+      # To be enabled later when all code type checks
+      # - id: pyright
+      #   name: pyright
+      #   entry: pyright
+      #   language: node
+      #   types: [python]
+      #   pass_filenames: false
+      #   additional_dependencies: ["pyright@1.1.130"]
+      - id: pytest-check
+        name: pytest-check
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -10,4 +10,3 @@ services:
     volumes:
       - ../:/usr/local/src/picatrix/:ro
       - /tmp/:/usr/local/src/picadata/
-

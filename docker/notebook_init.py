@@ -13,10 +13,6 @@
 # limitations under the License.
 """This is an import file that runs on every startup of the Jupyter runtime."""
 
-import altair as alt
-import pandas as pd
-import numpy as np
-
 from picatrix import notebook_init
 
 notebook_init.init()
