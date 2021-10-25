@@ -8,3 +8,4 @@ pandas>=1.1.3
 timesketch-api-client>=20201130
 timesketch-import-client>=20200910
 typing-extensions>=3.7.4.3
+docstring-parser>>=0.12
