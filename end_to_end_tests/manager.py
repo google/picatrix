@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This file contains a class for managing end to end tests."""
-from typing import Generator
-from typing import Tuple
-from typing import Text
+from typing import Generator, Text, Tuple
 
 from . import interface
 
@@ -26,8 +24,8 @@ class EndToEndTestManager:
   _exclude_registry: set = set()
 
   @classmethod
-  def get_tests(cls) -> Generator[
-      Tuple[Text, interface.BaseEndToEndTest], None, None]:
+  def get_tests(
+      cls) -> Generator[Tuple[Text, interface.BaseEndToEndTest], None, None]:
     """Retrieves the registered tests.
 
     Yields:
@@ -62,7 +60,8 @@ class EndToEndTestManager:
 
   @classmethod
   def register_test(
-      cls, test_class: interface.BaseEndToEndTest,
+      cls,
+      test_class: interface.BaseEndToEndTest,
       exclude_from_list: bool = False):
     """Registers an test class.
 
@@ -79,8 +78,8 @@ class EndToEndTestManager:
     """
     test_name = test_class.NAME.lower()
     if test_name in cls._class_registry:
-      raise KeyError('Class already set for name: {0:s}.'.format(
-          test_class.NAME))
+      raise KeyError(
+          'Class already set for name: {0:s}.'.format(test_class.NAME))
     cls._class_registry[test_name] = test_class
     if exclude_from_list:
       cls._exclude_registry.add(test_name)

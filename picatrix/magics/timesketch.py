@@ -6,35 +6,21 @@ It enables colab/jupyter to send and receive data from a Timesketch sketch.
 import datetime
 import logging
 import os
-
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Text
-from typing import Union
+from typing import Any, Dict, List, Optional, Text, Union
 
 import dateutil.parser
-
-from dfdatetime import time_elements
-
 import pandas as pd
-
+from dfdatetime import time_elements
 from timesketch_api_client import aggregation as api_aggregation
-from timesketch_api_client import config
 from timesketch_api_client import client as api_client
+from timesketch_api_client import config
 from timesketch_api_client import search as api_search
 from timesketch_api_client import sketch as api_sketch
 from timesketch_api_client import story as api_story
 from timesketch_api_client import timeline as api_timeline
+from timesketch_import_client import helper, importer
 
-from timesketch_import_client import helper
-from timesketch_import_client import importer
-
-from picatrix.lib import framework
-from picatrix.lib import state
-from picatrix.lib import utils
-
+from picatrix.lib import framework, state, utils
 
 logger = logging.getLogger('picatrix.magics.timesketch')
 
@@ -150,7 +136,8 @@ def connect(
         'one using %timesketch_set_active_sketch <sketch_id>')
 
   client = config.get_client(
-      config_section=config_section, token_password=token_password,
+      config_section=config_section,
+      token_password=token_password,
       confirm_choices=confirm_choices)
   if not client:
     raise ValueError('Unable to connect to Timesketch')
@@ -159,7 +146,9 @@ def connect(
 
 
 def get_context_date(
-    date_string: Text, minutes: Optional[int] = 0, seconds: Optional[int] = 90,
+    date_string: Text,
+    minutes: Optional[int] = 0,
+    seconds: Optional[int] = 90,
     return_fields: Text = '') -> pd.DataFrame:
   """Return time context surrounding a single data frame row.
 
@@ -181,7 +170,7 @@ def get_context_date(
   """
   chip = api_search.DateIntervalChip()
   date_object = dateutil.parser.parse(date_string)
-  chip.date = date_object.strftime('%Y-%m-%dT%H:%M:%S%')
+  chip.date = date_object.strftime('%Y-%m-%dT%H:%M:%S')
 
   if minutes:
     chip.unit = 'm'
@@ -194,15 +183,14 @@ def get_context_date(
 
   return_fields = _fix_return_fields(return_fields)
 
-  search_obj = query_timesketch(
-      '*',
-      return_fields=return_fields)
+  search_obj = query_timesketch('*', return_fields=return_fields)
   search_obj.add_chip(chip)
   return search_obj
 
 
 def get_context_row(
-    row: pd.Series, minutes: Optional[int] = 0,
+    row: pd.Series,
+    minutes: Optional[int] = 0,
     seconds: Optional[int] = 90,
     return_fields: str = '') -> pd.DataFrame:
   """Return time context surrounding a single data frame row.
@@ -236,7 +224,9 @@ def get_context_row(
     date_string = date_string.strftime('%Y-%m-%dT%H:%M:%S%z')
 
   return get_context_date(
-      date_string, minutes=minutes, seconds=seconds,
+      date_string,
+      minutes=minutes,
+      seconds=seconds,
       return_fields=return_fields)
 
 
@@ -309,7 +299,8 @@ def set_active_sketch(
           client object.
   """
   connect(
-      ignore_sketch=True, config_section=section,
+      ignore_sketch=True,
+      config_section=section,
       token_password=token_password,
       confirm_choices=confirm_choices,
       force_switch=reconnect)
@@ -355,7 +346,8 @@ def timesketch_get_client(data='') -> api_client.TimesketchApi:
 
 @framework.picatrix_magic
 def timesketch_add_manual_event(
-    data: Text, timestamp: Optional[int] = 0,
+    data: Text,
+    timestamp: Optional[int] = 0,
     date_string: Optional[Text] = '',
     timestamp_desc: Optional[Text] = '',
     attributes: Optional[Dict[str, Any]] = None,
@@ -523,7 +515,7 @@ def query_timesketch(
   state_obj = state.state()
   sketch = state_obj.get_from_cache('timesketch_sketch')
 
-  if all([x is None for x in [query, query_dsl]]):
+  if all(x is None for x in [query, query_dsl]):
     raise KeyError('Need to provide a query or query_dsl')
 
   chip = None
@@ -621,20 +613,25 @@ def timesketch_query(
     sketch = state_obj.get_from_cache('timesketch_sketch')
     timeline_list = sketch.list_timelines()
     names = [x.lower() for x in timelines.split(',')]
-    indices = [
-        x.id for x in timeline_list if x.name.lower() in names]
+    indices = [x.id for x in timeline_list if x.name.lower() in names]
   else:
     indices = None
 
   return query_timesketch(
-      query=data, return_fields=fields, query_filter=query_filter,
-      indices=indices, start_date=start_date, end_date=end_date,
+      query=data,
+      return_fields=fields,
+      query_filter=query_filter,
+      indices=indices,
+      start_date=start_date,
+      end_date=end_date,
       max_entries=max_entries)
 
 
 @framework.picatrix_magic
 def timesketch_context_date(
-    data: Text, minutes: int, seconds: Optional[int] = 90,
+    data: Text,
+    minutes: int,
+    seconds: Optional[int] = 90,
     fields: Optional[Text] = '') -> pd.DataFrame:
   """Run a Timesketch context query using a magic.
 
@@ -689,9 +686,10 @@ def timesketch_context_row(
   connect()
 
   if not isinstance(data, pd.Series):
-    raise ValueError((
-        'This magic expects a pandas Series object, use curly braces '
-        '{{var_name}} to expand variable names.'))
+    raise ValueError(
+        (
+            'This magic expects a pandas Series object, use curly braces '
+            '{{var_name}} to expand variable names.'))
 
   if minutes:
     seconds = minutes * 60
@@ -777,7 +775,7 @@ def timesketch_create_sketch(
 
 @framework.picatrix_magic
 def timesketch_get_saved_searches(
-      data: Optional[Text] = '') -> Dict[str, api_search.Search]:
+    data: Optional[Text] = '') -> Dict[str, api_search.Search]:
   """Get all saved searches from an active sketch.
 
   Args:
@@ -812,7 +810,8 @@ def timesketch_get_saved_searches(
 
 @framework.picatrix_magic
 def timesketch_set_active_sketch(
-    data: Text, reconnect: Optional[bool] = False,
+    data: Text,
+    reconnect: Optional[bool] = False,
     token_password: Optional[Text] = '',
     confirm_choices: Optional[bool] = False,
     config_section: Optional[Text] = 'timesketch'):
@@ -832,8 +831,11 @@ def timesketch_set_active_sketch(
   """
   sketch_id = int(data.strip(), 10)
   set_active_sketch(
-      sketch_id, section=config_section, token_password=token_password,
-      reconnect=reconnect, confirm_choices=confirm_choices)
+      sketch_id,
+      section=config_section,
+      token_password=token_password,
+      reconnect=reconnect,
+      confirm_choices=confirm_choices)
   utils.clear_notebook_output()
 
 
@@ -856,9 +858,10 @@ def timesketch_upload_data(
         data is invalid.
   """
   if not isinstance(data, pd.DataFrame):
-    raise ValueError((
-        'The data attribute is not a pandas DataFrame, please use curly '
-        'braces to expand variables.'))
+    raise ValueError(
+        (
+            'The data attribute is not a pandas DataFrame, please use curly '
+            'braces to expand variables.'))
 
   if not name:
     name = 'unknown_timeline'
@@ -928,9 +931,9 @@ def timesketch_list_timelines(data: Optional[Text] = '') -> Text:
   return_lines = []
 
   for timeline in timelines:
-    return_lines.append('         --- Timeline: {0:^s} ---'.format(
-        timeline.name))
-    return_lines.append('-'*80)
+    return_lines.append(
+        '         --- Timeline: {0:^s} ---'.format(timeline.name))
+    return_lines.append('-' * 80)
     return_lines.append('')
 
     data = timeline.data
@@ -964,7 +967,7 @@ def timesketch_list_timelines(data: Optional[Text] = '') -> Text:
         return_lines.append('Error Message:')
         return_lines.append(analyzer_output)
 
-    return_lines.append('='*80)
+    return_lines.append('=' * 80)
     return_lines.append('')
   return '\n'.join(return_lines)
 
@@ -1007,8 +1010,7 @@ def timesketch_get_aggregations(
 
 # pylint:disable=unused-argument
 @framework.picatrix_magic
-def timesketch_available_aggregators(
-    data: Optional[Text] = '') -> pd.DataFrame:
+def timesketch_available_aggregators(data: Optional[Text] = '') -> pd.DataFrame:
   """Returns a data frame with information about available aggregators.
 
   Args:
@@ -1029,7 +1031,7 @@ def timesketch_available_aggregators(
     if fields:
       del line['fields']
     for index, field in enumerate(fields):
-      line['field_{0:d}'.format(index+1)] = '{0:s}: {1:s}'.format(
+      line['field_{0:d}'.format(index + 1)] = '{0:s}: {1:s}'.format(
           field.get('description', 'N/A'), field.get('name'))
     lines.append(line)
   return pd.DataFrame(lines)
@@ -1082,8 +1084,9 @@ def timesketch_refresh_token(data: Optional[Text] = '') -> Text:
 
 @framework.picatrix_magic
 def timesketch_run_aggregation_dsl(
-    data: Text, as_object: Optional[bool] = False) -> Union[
-        pd.DataFrame, api_aggregation.Aggregation]:
+    data: Text,
+    as_object: Optional[bool] = False
+) -> Union[pd.DataFrame, api_aggregation.Aggregation]:
   """Run an aggregation query against the datastore.
 
   Args:
@@ -1132,8 +1135,7 @@ def timesketch_run_aggregator(
   if parameters is None:
     parameters = {}
 
-  return sketch.run_aggregator(
-      data.strip(), aggregator_parameters=parameters)
+  return sketch.run_aggregator(data.strip(), aggregator_parameters=parameters)
 
 
 # pylint: disable=unused-argument
@@ -1189,10 +1191,7 @@ def timesketch_search_by_label(
       A pandas DataFrame with the search results.
   """
   return _label_search(
-      data.strip(),
-      return_fields=return_fields,
-      max_entries=max_entries
-  )
+      data.strip(), return_fields=return_fields, max_entries=max_entries)
 
 
 # pylint: disable=unused-argument
@@ -1210,9 +1209,7 @@ def timesketch_get_starred_events(
       A pandas DataFrame with starred events.
   """
   return _label_search(
-      '__ts_star',
-      return_fields=return_fields,
-      max_entries=max_entries)
+      '__ts_star', return_fields=return_fields, max_entries=max_entries)
 
 
 # pylint: disable=unused-argument
@@ -1231,9 +1228,7 @@ def timesketch_events_with_comments(
       them.
   """
   return _label_search(
-      '__ts_comment',
-      return_fields=return_fields,
-      max_entries=max_entries)
+      '__ts_comment', return_fields=return_fields, max_entries=max_entries)
 
 
 # pylint: disable=unused-argument

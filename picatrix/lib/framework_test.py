@@ -13,11 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the picatrix framework."""
-from typing import Optional
-from typing import Text
+from typing import Optional, Text
 
-from picatrix.lib import framework
-from picatrix.lib import manager
+from picatrix.lib import framework, manager
 
 
 def my_very_own_test_magic(data: Text, stuff: Optional[int] = 20) -> Text:

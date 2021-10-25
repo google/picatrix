@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test library for picatrix."""
-from typing import Any
-from typing import Text
+from typing import Any, Text
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from IPython.testing.globalipapp import start_ipython
 
 from picatrix.lib import manager
-
 
 manager.MagicManager.is_test = True
 
