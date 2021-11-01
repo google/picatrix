@@ -13,7 +13,7 @@ The general flow is:
 
 ## Setting up Git
 
-Start by visiting the [project](https://github.com/google/picatrix) and click the `Fork` 
+Start by visiting the [project](https://github.com/google/picatrix) and click the `Fork`
 button in the upper right corner of the project to fork the project into your personal
 account.
 
@@ -104,18 +104,18 @@ Your pull request cannot be merged until the checkers report everything is OK.
 
 ## Making changes after reviews
 
-Your pull request will be assigned to a project maintainer either by you or the reviewer. 
+Your pull request will be assigned to a project maintainer either by you or the reviewer.
 The maintainer will review your code, and may push some changes to your branch and/or request
-that you make changes. If they do make changes, make sure your local copy of the branch 
+that you make changes. If they do make changes, make sure your local copy of the branch
 (git pull) before making further changes.
 
 After they've reviewed your code, make any necessary changes, and push them to your
 feature branch. After that, reply to the comments made by the reviewer, then request
 a new review from the same reviewer. In the upper right corner in the `Reviewers`
-category a button should be there to re-request a review from a reviewer (ATM it is a circle, 
+category a button should be there to re-request a review from a reviewer (ATM it is a circle,
 or arrows that make up a circle).
 
 ## Merging
 Once the pull request assignee is happy with your proposed changes, and all the status
-checks have passed, the assignee will merge your pull request into the project. 
+checks have passed, the assignee will merge your pull request into the project.
 Once that's completed, you can delete your feature branch.

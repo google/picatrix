@@ -106,7 +106,7 @@ Or you can do it this way:
 %my_silly_magic --bindto bar --magnitude 203 foobar
 ```
 
-That would store the results into a variable called `bar`, so that: 
+That would store the results into a variable called `bar`, so that:
 
 ```
 bar == 'This magical magic produced 203 magics of foobar

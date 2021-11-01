@@ -36,18 +36,19 @@ def test_getting_last_magic():
 def test_working_with_cache():
   """Test working with the cache."""
   ip = testlib.InteractiveTest.get_shell()
-  res = ip.run_cell(raw_cell=(
-      'from picatrix.lib import state\n'
-      'state.state()\n'))
+  res = ip.run_cell(
+      raw_cell=('from picatrix.lib import state\n'
+                'state.state()\n'))
   assert res.success
   state_obj = res.result
   state_obj.add_to_cache('foobar', 1234)
 
   assert state_obj.get_from_cache('foobar') == 1234
 
-  res = ip.run_cell(raw_cell=(
-      'state_obj = state.state()\n'
-      'state_obj.get_from_cache("foobar")\n'))
+  res = ip.run_cell(
+      raw_cell=(
+          'state_obj = state.state()\n'
+          'state_obj.get_from_cache("foobar")\n'))
   assert res.success
   assert res.result == 1234
 

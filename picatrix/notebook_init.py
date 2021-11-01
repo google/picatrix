@@ -23,8 +23,7 @@ And that would register magics and initialize the notebook to be able
 to take advantage of picatrix magics and helper functions.
 """
 # pylint: disable=unused-import
-from picatrix import helpers
-from picatrix import magics
+from picatrix import helpers, magics
 from picatrix.lib import state
 
 

@@ -14,14 +14,9 @@
 """Class that defines the state, which ."""
 import logging
 import threading
-
-from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Text
+from typing import Any, Dict, Optional, Text
 
 from picatrix.lib import utils
-
 
 logger = logging.getLogger('picatrix.state')
 
@@ -94,7 +89,9 @@ class State:
         del self._cache[name]
 
   def set_output(
-      self, output: Any, magic_name: Text,
+      self,
+      output: Any,
+      magic_name: Text,
       bind_to: Optional[Text] = '') -> Optional[Any]:
     """Sets an output from a magic and stores it in the namespace if needed.
 

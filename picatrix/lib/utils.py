@@ -13,10 +13,7 @@
 # limitations under the License.
 """Common reusable components for picatrix."""
 import sys
-
-from typing import Any
-from typing import Optional
-from typing import Text
+from typing import Any, Optional, Text
 
 from IPython import get_ipython
 from IPython.display import clear_output

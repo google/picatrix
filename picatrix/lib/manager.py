@@ -13,22 +13,14 @@
 # limitations under the License.
 """Class that defines the manager for all magics."""
 
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Text
-from typing import Tuple
-from typing import Union
-
-from dataclasses import dataclass
 import functools
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Text, Tuple, Union
+
 import pandas
 from IPython import get_ipython
 
-from picatrix.lib import utils
-from picatrix.lib import state
+from picatrix.lib import state, utils
 
 
 @dataclass
@@ -128,8 +120,10 @@ class MagicManager:
     return cls._magics.get(magic_name)
 
   @classmethod
-  def get_helper_info(cls, as_pandas: Optional[bool] = True) -> Union[
-      pandas.DataFrame, List[Tuple[Text, Text]]]:
+  def get_helper_info(
+      cls,
+      as_pandas: Optional[bool] = True
+  ) -> Union[pandas.DataFrame, List[Tuple[Text, Text]]]:
     """Get a list of all the registered helpers.
 
     Args:
@@ -152,16 +146,19 @@ class MagicManager:
         hint_strings.append(f'{key} [{value_string}]')
       helper_string = ', '.join(hint_strings)
 
-      lines.append({
-          'name': name,
-          'help': helper.help,
-          'arguments': helper_string,
-      })
+      lines.append(
+          {
+              'name': name,
+              'help': helper.help,
+              'arguments': helper_string,
+          })
     return pandas.DataFrame(lines)
 
   @classmethod
-  def get_magic_info(cls, as_pandas: Optional[bool] = True) -> Union[
-      pandas.DataFrame, List[Tuple[Text, Text]]]:
+  def get_magic_info(
+      cls,
+      as_pandas: Optional[bool] = True
+  ) -> Union[pandas.DataFrame, List[Tuple[Text, Text]]]:
     """Get a list of all magics.
 
     Args:
@@ -173,8 +170,10 @@ class MagicManager:
       boolean.
     """
     if not as_pandas:
-      return [(x.magic_name, x.__doc__.split('\n')[0]) for x in iter(
-          cls._magics.values())]
+      return [
+          (x.magic_name, x.__doc__.split('\n')[0])
+          for x in iter(cls._magics.values())
+      ]
 
     entries = []
     for magic_name, magic_class in iter(cls._magics.items()):
@@ -184,7 +183,8 @@ class MagicManager:
           'cell': f'%%{magic_name}',
           'line': f'%{magic_name}',
           'function': f'{magic_name}_func',
-          'description': description}
+          'description': description
+      }
       entries.append(magic_dict)
 
     df = pandas.DataFrame(entries)
@@ -204,8 +204,7 @@ class MagicManager:
       KeyError: if the helper is already registered.
     """
     if name in cls._helpers:
-      raise KeyError(
-          f'The helper [{name}] is already registered.')
+      raise KeyError(f'The helper [{name}] is already registered.')
     doc_string = helper.__doc__
     if doc_string:
       help_string = doc_string.split('\n')[0]
@@ -217,7 +216,8 @@ class MagicManager:
 
   @classmethod
   def register_magic(
-      cls, function: Callable[[Text, Text], Text],
+      cls,
+      function: Callable[[Text, Text], Text],
       conditional: Callable[[], bool] = None):
     """Register magic function as a magic in picatrix.
 
@@ -240,8 +240,7 @@ class MagicManager:
     magic_name = function.magic_name
 
     if magic_name in cls._magics:
-      raise KeyError(
-          f'The magic [{magic_name}] is already registered.')
+      raise KeyError(f'The magic [{magic_name}] is already registered.')
 
     ip = get_ipython()
     if ip:
@@ -253,11 +252,13 @@ class MagicManager:
 
     def capture_output(function, name):
       """A function that wraps around magic functions to capture output."""
+
       @functools.wraps(function)
       def wrapper(*args, **kwargs):
         function_output = function(*args, **kwargs)
         state_obj = state.state()
         return state_obj.set_output(function_output, magic_name=name)
+
       return wrapper
 
     _ = utils.ipython_bind_global(

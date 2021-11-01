@@ -13,18 +13,13 @@
 # limitations under the License.
 """Interface for end-to-end tests."""
 
-from typing import Callable
-from typing import Generator
-from typing import Text
-from typing import Tuple
-
-import unittest
-import inspect
 import collections
+import inspect
 import logging
+import unittest
+from typing import Callable, Generator, Text, Tuple
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
-
 
 logger = logging.getLogger('picatrix.e2e_test')
 
@@ -47,8 +42,10 @@ class BaseEndToEndTest:
     self.assertions = unittest.TestCase()
     self._counter = collections.Counter()
 
-  def _get_test_methods(self) -> Generator[
-      Tuple[Text, Callable[[TerminalInteractiveShell], None]], None, None]:
+  def _get_test_methods(
+      self
+  ) -> Generator[Tuple[Text, Callable[[TerminalInteractiveShell], None]], None,
+                 None]:
     """Inspect class and list all methods that matches the criteria.
 
     Yields:
@@ -77,8 +74,7 @@ class BaseEndToEndTest:
       try:
         test_func(ip)
       except Exception:  # pylint: disable=broad-except
-        logger.error(
-            'Error while running test %s', self.NAME, exc_info=True)
+        logger.error('Error while running test %s', self.NAME, exc_info=True)
         self._counter['errors'] += 1
         continue
       logger.info('%s [OK]', test_name)

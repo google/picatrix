@@ -13,5 +13,4 @@
 # limitations under the License.
 """Class that loads up all magic libraries."""
 
-from picatrix.magics import common
-from picatrix.magics import timesketch
+from picatrix.magics import common, timesketch
