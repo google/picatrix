@@ -13,14 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This is the setup file for the project."""
-from __future__ import unicode_literals
+from typing import List, Text
 
 from setuptools import find_packages, setup
 
-from picatrix import version
 
-
-def from_file(name):
+def from_file(name: Text) -> List[Text]:
   """Read dependencies from requirements.txt file."""
   with open(name, "r", encoding="utf-8") as f:
     return f.read().splitlines()
@@ -32,7 +30,7 @@ long_description = (
 
 setup(
     name="picatrix",
-    version=version.get_version(),
+    version="20210519",
     description="Picatrix IPython Helpers",
     long_description=long_description,
     license="Apache License, Version 2.0",
