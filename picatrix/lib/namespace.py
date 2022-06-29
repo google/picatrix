@@ -117,7 +117,7 @@ class Namespace(SimpleNamespace, Generic[A]):
       raise NamespaceKeyExistsError(
           f"\"{key}\" already exists; remove it "
           "first with `del` operator, "
-          f"e.g. `del ns[\"{key}\"]`")
+          f"e.g. `del {self.name}.{key}`")
     else:
       super().__setattr__(key, value)
 
@@ -257,14 +257,16 @@ class MagicNamespace(Namespace[Function]):
 class FeatureNamespace(Namespace[Function]):
   """Namespace hosting functionalities of the specific feature."""
 
-  def add_function(self, key: Text, func: Function):
+  def add_function(self, func: Function, name: Optional[Text] = None):
     """Adds a new function to the namespace.
 
     Raises:
       NamespaceKeyExistsError: when required key already exists
       NamespaceKeyError: when key is invalid, e.g. isn't Python identifier
     """
-    self._add(key, func)
+    if name is None:
+      name = func.__name__
+    self._add(name, func)
 
 
 class RootNamespace(Namespace[Union[FeatureNamespace, Function]]):
@@ -280,14 +282,16 @@ class RootNamespace(Namespace[Union[FeatureNamespace, Function]]):
         _join_key(self.name, "magic"),
         "Namespace holding all IPython magics registered by Picatrix.")
 
-  def add_function(self, key: Text, func: Function):
+  def add_function(self, func: Function, name: Optional[Text] = None):
     """Adds a new function to the namespace.
 
     Raises:
       NamespaceKeyExistsError: when required key already exists
       NamespaceKeyError: when key is invalid, e.g. isn't Python identifier
     """
-    self._add(key, func)
+    if name is None:
+      name = func.__name__
+    self._add(name, func)
 
   def add_line_magic(self, func: Function, name: Optional[Text] = None):
     """Adds new line magic (`%magic`) to the namespace.
@@ -337,7 +341,7 @@ class RootNamespace(Namespace[Union[FeatureNamespace, Function]]):
       docstring = f"`{key}` contains all Picatrix features of {name}"
 
     ns = FeatureNamespace(name=key, docstring=docstring)
-    self._add(key, ns)
+    self._add(name, ns)
     return ns
 
 
@@ -377,5 +381,5 @@ class RootContext(Namespace[FeatureContext]):
       docstring = f"`{key}` contains all Picatrix context for {name}"
 
     ctx = FeatureContext(name=key, docstring=docstring)
-    self._add(key, ctx)
+    self._add(name, ctx)
     return ctx

@@ -24,6 +24,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    NoReturn,
     Optional,
     Text,
     Type,
@@ -33,6 +34,7 @@ from typing import (
 from docstring_parser import parse
 
 from .error import Error
+from .utils import ipython_bind_global
 
 
 class MagicError(Error):
@@ -86,9 +88,9 @@ class ArgParserNonZeroStatus(Exception):
 
 
 class MagicArgumentParser(argparse.ArgumentParser):
-  """Argument parser for picatrix magics."""
+  """Argument parser for Picatrix magics."""
 
-  def exit(self, status: int = 0, message: Optional[Text] = None):
+  def exit(self, status: int = 0, message: Optional[Text] = None) -> NoReturn:
     """Exiting method for argument parser.
 
     Args:
@@ -100,22 +102,26 @@ class MagicArgumentParser(argparse.ArgumentParser):
       ArgParserNonZeroStatus: when the parser has successfully completed.
     """
     if not status:
-      raise ArgParserNonZeroStatus('Exiting.')
+      raise ArgParserNonZeroStatus()
 
     if message:
       raise MagicArgParsingError(message.strip())
 
-    raise MagicArgParsingError('Wrong usage.')
+    raise MagicArgParsingError("Wrong usage.")
 
   def parse_magic_args(
       self, line: Text, cell: Optional[Text] = None) -> MagicArgs:
     """Parse arguments out of line and cell content as provided by IPython."""
     line = line.strip()
 
+    kwargs: Dict[Text, MagicArgValue] = {}
+    if cell:
+      kwargs["cell"] = cell
+
     if line and "-- " not in line:
-      return MagicArgs(bind_variable=line)
+      return MagicArgs(bind_variable=line, kwargs=kwargs)
     if line.endswith("--"):
-      return MagicArgs(bind_variable=line.rstrip("--"))
+      return MagicArgs(bind_variable=line.rstrip("--"), kwargs=kwargs)
 
     if not line:
       bind_variable = "_"
@@ -126,12 +132,9 @@ class MagicArgumentParser(argparse.ArgumentParser):
     else:
       bind_variable, raw = line.split(" -- ", maxsplit=1)
 
-    kwargs: Dict[Text, MagicArgValue] = {
-        str(arg): _validate_arg_value(arg, value)
-        for arg, value in self.parse_args(shlex.split(raw)).__dict__.items()
-    }
-    if cell:
-      kwargs["cell"] = cell
+    for arg, value in self.parse_args(shlex.split(raw)).__dict__.items():
+      kwargs[str(arg)] = _validate_arg_value(arg, value)
+
     return MagicArgs(bind_variable, kwargs)
 
 
@@ -144,7 +147,7 @@ def _usage_string(
   if mtyp == MagicType.LINE:
     return f"\n```%%%(prog)s [bind_variable] -- [-h] {arguments}```"
   else:
-    return f"\n```\n%%%%%(prog)s [bind_variable] -- [-h] {arguments}\ndata\n```"
+    return f"\n```\n%%%%%(prog)s [bind_variable] -- [-h] {arguments}\ncell\n```"
 
 
 @dataclass(frozen=True)
@@ -211,7 +214,7 @@ class _MagicSpec:
 
     if spec.annotations:
       for arg, typ_ in spec.annotations.items():
-        if typ_ in _MagicArgValues:
+        if arg == "return" or typ_ in _MagicArgValues:
           args_types[arg] = typ_
         else:
           raise MagicParsingError(
@@ -240,12 +243,15 @@ class _MagicSpec:
   def to_parser(self) -> MagicArgumentParser:
     """Create an argument parser out of _MagicSpec."""
     desc, *_ = self.docstring.split('\n')
+
+    visible_args = self.args_with_no_defaults
+    if self.typ == MagicType.CELL:
+      visible_args = [a for a in self.args_with_no_defaults if a != "cell"]
     parser = MagicArgumentParser(
         prog=self.name,
         description=desc,
         usage=_usage_string(
-            self.typ, self.args_with_no_defaults,
-            self.args_with_defaults.keys()))  # pylint: disable=no-member
+            self.typ, visible_args, self.args_with_defaults.keys()))  # pylint: disable=no-member
 
     for arg in self.args_with_no_defaults:  # pylint: disable=not-an-iterable
       if self.typ == MagicType.CELL and arg == "cell":
@@ -295,5 +301,10 @@ class Magic:
     return cls(spec, spec.to_parser(), func, func.__doc__ or cls.__doc__)
 
   def __call__(self, line: Text, cell: Optional[Text] = None) -> Any:
-    args = self._parser.parse_magic_args(line, cell)
-    globals()[args.bind_variable] = self.func(**args.kwargs)  #pylint: disable=not-a-mapping
+    try:
+      args = self._parser.parse_magic_args(line, cell)
+      res = self.func(**args.kwargs)
+      ipython_bind_global(args.bind_variable, res)
+      return res
+    except ArgParserNonZeroStatus:
+      return None

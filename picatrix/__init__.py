@@ -109,7 +109,7 @@ def new_cell_magic(func: Function, name: Optional[Text] = None):
     NamespaceKeyError: when key is invalid, e.g. isn't Python identifier
     MagicParsingError: when provided function is an invalid magic
   """
-  px.add_cell_magic(func, name)
+  px.add_cell_magic(func, name if name else func.__name__)
 
 
 # shouldn't be exported
