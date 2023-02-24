@@ -397,14 +397,14 @@ def timesketch_add_manual_event(
             'Unable to convert date string, is it really in ISO 8601 format?')
         return {}
     try:
-      elements.CopyFromString(date_string)
+      elements.CopyFromStringRFC822(date_string)
     except ValueError:
       try:
         elements.CopyFromStringRFC1123(date_string)
       except ValueError:
         logger.error(
-            'Unable to convert date string, needs to be in ISO 8601, 1123 or '
-            'in the format YYYY-MM-DD hh:mm:ss.######[+-]##:##')
+            'Unable to convert date string, needs to be in ISO 8601, RFC 822'
+            ' or 1123')
         return {}
     date = elements.CopyToDateTimeStringISO8601()
 
