@@ -6,6 +6,4 @@ jupyter-contrib-nbextensions>=0.5.1
 jupyter-http-over-ws>=0.0.8
 jupyter>=1.0.0
 matplotlib>=2.2.0
-numpy>=1.19.0
-pandas>=1.1.3
 scikit-learn>=1.0
