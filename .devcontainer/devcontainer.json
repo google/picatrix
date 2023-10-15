@@ -12,7 +12,7 @@
 			// Update 'VARIANT' to pick a Python version: 3, 3.9, 3.8, 3.7, 3.6.
 			// Append -bullseye or -buster to pin to an OS version.
 			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3.7",
+			"VARIANT": "3.9",
 			// Options
 			"NODE_VERSION": "lts/*"
 		}
@@ -29,12 +29,13 @@
 		"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
 		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
-		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
+		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint"
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-python.python",
-		"ms-python.vscode-pylance"
+		"ms-python.vscode-pylance",
+		"elagil.pre-commit-helper"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
