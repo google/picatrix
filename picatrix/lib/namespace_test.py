@@ -21,7 +21,7 @@ from typing import Union
 import pandas as pd
 import pytest
 
-from .namespace import Namespace, NamespaceKeyError
+from .namespace import AccessorNamespaceTemplate, Namespace, NamespaceKeyError
 
 
 def test_invalid_key():
@@ -107,3 +107,94 @@ def test_to_frame():
       ])
   got = n.to_frame(with_doc=True)
   assert want.equals(got)
+
+
+def test_accessor_template_add_accessor():
+  """Test adding accessors to AccessorNamespaces through templates."""
+
+  ant = AccessorNamespaceTemplate("Some docstring")
+  ant.add_accessor("i_never_attach", validator=lambda _: False)(lambda x: x)
+
+  with pytest.raises(AttributeError):
+    _ = ant.create(
+        pd.DataFrame.from_records(
+            [
+                {
+                    "name": "something",
+                    "value": 11
+                },
+                {
+                    "name": "anything",
+                    "value": 15
+                },
+            ]))
+
+  ant.add_accessor("i_always_attach", validator=lambda _: True)(lambda x: x)
+  ant.add_accessor(
+      "i_conditionally_attach",
+      validator=lambda df: "abracadabra" in df.columns)(lambda x: x)
+
+  ns1 = ant.create(
+      pd.DataFrame.from_records(
+          [
+              {
+                  "name": "something",
+                  "value": 11
+              },
+              {
+                  "name": "anything",
+                  "value": 15
+              },
+          ]))
+
+  assert "i_always_attach" in ns1
+  assert "i_never_attach" not in ns1
+  assert "i_conditionally_attach" not in ns1
+
+  ns2 = ant.create(
+      pd.DataFrame.from_records(
+          [
+              {
+                  "name": "something",
+                  "value": 11,
+                  "abracadabra": "alakazam"
+              },
+              {
+                  "name": "anything",
+                  "value": 15,
+                  "abracadabra": "hocus pocus"
+              },
+          ]))
+
+  assert "i_always_attach" in ns2
+  assert "i_never_attach" not in ns2
+  assert "i_conditionally_attach" in ns2
+
+
+def test_accessor_template_call_accessor():
+  """Test calling the accessor in AccessorNamepace created out of template."""
+
+  ant = AccessorNamespaceTemplate("Some docstring")
+  ant.add_accessor(
+      "echo", validator=lambda _: True)(lambda df, a, b, c: (df, a, b, c))
+
+  df = pd.DataFrame.from_records(
+      [
+          {
+              "name": "something",
+              "value": 11,
+              "abracadabra": "alakazam"
+          },
+          {
+              "name": "anything",
+              "value": 15,
+              "abracadabra": "hocus pocus"
+          },
+      ])
+  a, b, c = 1, 2, 3
+
+  ns = ant.create(df)
+
+  df_, a_, b_, c_ = ns.echo(a, b, c)
+
+  assert df.equals(df_) and a == a_ and b == b_ and c == c_

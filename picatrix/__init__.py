@@ -13,9 +13,12 @@
 # limitations under the License.
 """Sets up Picatrix environment."""
 
-from typing import Optional, Text, Tuple
+from typing import Dict, Optional, Text, Tuple
+
+import pandas as pd
 
 from .lib.namespace import (
+    AccessorNamespaceTemplate,
     FeatureContext,
     FeatureNamespace,
     Function,
@@ -112,6 +115,39 @@ def new_cell_magic(func: Function, name: Optional[Text] = None):
   px.add_cell_magic(func, name if name else func.__name__)
 
 
+_accessor_namespaces: Dict[Text, AccessorNamespaceTemplate] = {}
+
+
+def new_accessor_namespace(
+    name: Text, docstring: Optional[Text] = None) -> AccessorNamespaceTemplate:
+  """Adds a new Pandas DataFrame accessor namespace.
+
+  Function returns an AccessorNamespaceTemplate which exposes `.add` that
+  can be used to add functions (accessors) to the namespace.
+  Newly added namespace will later be available as <dataframe_obj>.<name>
+  and its accessors as <dataframe_obj>.<name>.<accessor_name>.
+
+  Args:
+    name: name of the the namespace
+    docstring: a string describing the functionalities of the namespace
+
+  Returns:
+    AccessorNamespaceTemplate: a template to be used for spawning accessor
+      namespaces
+  """
+  if not docstring:
+    docstring = f"Group of namespaces related to \"{name}\""
+
+  template = AccessorNamespaceTemplate(docstring)
+  reg = pd.api.extensions.register_dataframe_accessor  # type: ignore
+  reg(name)(template.create)
+
+  _accessor_namespaces[name] = template
+  return template
+
+
 # shouldn't be exported
-del Optional, Text, Tuple  # type: ignore
-del FeatureContext, FeatureNamespace, Function, RootContext, RootNamespace,
+del Dict, Optional, Text, Tuple
+del AccessorNamespaceTemplate, FeatureContext, FeatureNamespace,
+del Function, RootContext, RootNamespace
+del pd

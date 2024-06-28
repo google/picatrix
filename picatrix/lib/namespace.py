@@ -14,6 +14,7 @@
 """Types and functions defining Picatrix namespacing."""
 
 from difflib import get_close_matches
+from functools import wraps
 from inspect import cleandoc
 from types import SimpleNamespace
 from typing import (
@@ -96,16 +97,14 @@ def _as_df_record(name: Text, item: Any, with_doc: bool,
   return record
 
 
-class Namespace(SimpleNamespace, Generic[A]):
-  """Key-value type of structure with items accessible as attributes."""
+class BareNamespace(SimpleNamespace, Generic[A]):
+  """Minimal key-value type of structure with items accessible as attributes."""
 
-  name: Text
   __dict__: Dict[Text, A]
 
-  def __init__(self, name: Text, docstring: Text, **kwargs: A):
+  def __init__(self, docstring: Text, **kwargs: Any):
     super().__init__(**kwargs)
     self.__doc__ = cleandoc(docstring)
-    self.name = name
 
   def __setattr__(self, key: Text, value: A):
     if not key.isidentifier():
@@ -123,7 +122,7 @@ class Namespace(SimpleNamespace, Generic[A]):
 
   def __getattr__(self, key: Text) -> A:
     if key in self:
-      return super().__getattr__(key)
+      return super().__getattribute__(key)
     else:
       raise NamespaceKeyMissingError(key, self.keys())
 
@@ -138,6 +137,26 @@ class Namespace(SimpleNamespace, Generic[A]):
 
   def __contains__(self, key: Text):
     return self.__dict__.__contains__(key)
+
+  def _add(self, key: Text, value: A):
+    """Adds a new value under the key.
+
+    Raises:
+      NamespaceKeyExistsError: when required key already exists
+      NamespaceKeyError: when key is invalid, e.g. isn't Python identifier
+    """
+    setattr(self, key, value)
+
+
+class Namespace(BareNamespace[A]):
+  """Key-value type of structure with items accessible as attributes."""
+
+  name: Text
+  __dict__: Dict[Text, A]
+
+  def __init__(self, name: Text, docstring: Text, **kwargs: A):
+    super().__init__(docstring, **kwargs)
+    self.name = name
 
   def keys(self) -> Iterator[Text]:
     """Iterator over all of the keys in the namespace."""
@@ -182,15 +201,6 @@ class Namespace(SimpleNamespace, Generic[A]):
     df = self.to_frame(with_doc=True)
     return df[df.Name.str.contains(keyword) |  # type: ignore
               df.Docstring.str.contains(keyword)]  # type: ignore
-
-  def _add(self, key: Text, value: A):
-    """Adds a new value under the key.
-
-    Raises:
-      NamespaceKeyExistsError: when required key already exists
-      NamespaceKeyError: when key is invalid, e.g. isn't Python identifier
-    """
-    setattr(self, key, value)
 
   def get(self, key: Text, default: A) -> A:
     """Return the value for key if key is in the namespace, else default."""
@@ -383,3 +393,78 @@ class RootContext(Namespace[FeatureContext]):
     ctx = FeatureContext(name=key, docstring=docstring)
     self._add(name, ctx)
     return ctx
+
+
+PandasAccessor = Callable[..., Any]
+"""Type representation of a pandas DataFrame accessor.
+
+The definition of this type should be `Callable[[pd.DataFrame, ...], Any]`
+(meaning first argument is a DataFrame and rest is up to the implementer)
+but it isn't allowed by Python typing system."""
+
+PandasAccessorValidator = Callable[[pandas.DataFrame], bool]
+"""Function validating if an accessor is applicable to a specific DataFrame."""
+
+AccessorDef = Tuple[Text, PandasAccessorValidator, PandasAccessor]
+"""Definition of the accessor, i.e. name, validator and the accessor itself."""
+
+
+def _accessor_wrapper(f: PandasAccessor, df: pandas.DataFrame):
+
+  @wraps(f)
+  def _inner(*args: Any, **kwargs: Any):
+    return f(df, *args, **kwargs)
+
+  return _inner
+
+
+class AccessorNamespace(BareNamespace[PandasAccessor]):
+  """Namespace holding pandas DataFrame accessors."""
+
+  def __init__(
+      self, docstring: Text, df: pandas.DataFrame, fs: List[AccessorDef]):
+    super().__init__(docstring)
+
+    valid = False
+    for name, validate, accessor in fs:
+      if validate(df):
+        self._add(name, _accessor_wrapper(accessor, df))
+        valid = True
+
+    if not valid:
+      raise AttributeError(
+          "DataFrame doesn't match requirments of any of the accessors.")
+
+
+class AccessorNamespaceTemplate:
+  """Holds parameters to be used to create AccessorNamespace."""
+  docstring: Text
+  functions: Dict[Text, Tuple[PandasAccessorValidator, PandasAccessor]]
+
+  def __init__(self, docstring: Text):
+    self.docstring = docstring
+    self.functions = {}
+
+  def add_accessor(
+      self,
+      name: Optional[Text] = None,
+      validator: PandasAccessorValidator = lambda _: True,
+  ) -> Callable[[PandasAccessor], None]:
+    """A decorator for adding accessor to the namespace."""
+
+    def _inner(accessor: PandasAccessor):
+
+      key = name if name else accessor.__name__
+
+      if key in self.functions:
+        raise KeyError(f"Accessor \"{key}\" already exists.")
+      else:
+        self.functions[key] = (validator, accessor)
+
+    return _inner
+
+  def create(self, df: pandas.DataFrame) -> AccessorNamespace:
+    """Creates AccessorNamespace."""
+    fs = [(n, v, a) for n, (v, a) in self.functions.items()]
+
+    return AccessorNamespace(self.docstring, df, fs)
